@@ -25,3 +25,5 @@ DOMAIN-SUFFIX,makersuite.google.com
 DOMAIN-SUFFIX,anthropic.com
 DOMAIN-SUFFIX,claude.ai.com
 DOMAIN-SUFFIX,challenges.cloudflare.com
+DOMAIN,cdn.usefathom.com
+DOMAIN-SUFFIX,claude.ai
