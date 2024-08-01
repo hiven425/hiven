@@ -25,5 +25,14 @@ DOMAIN-SUFFIX,makersuite.google.com
 DOMAIN-SUFFIX,anthropic.com
 DOMAIN-SUFFIX,claude.ai.com
 DOMAIN-SUFFIX,challenges.cloudflare.com
-DOMAIN,cdn.usefathom.com
 DOMAIN-SUFFIX,claude.ai
+DOMAIN-SUFFIX,deepmind.com
+DOMAIN-SUFFIX,deepmind.google
+DOMAIN-SUFFIX,generativeai.google
+DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com
+#DOMAIN
+DOMAIN,cdn.usefathom.com
+DOMAIN,ai.google.dev
+DOMAIN,alkalimakersuite-pa.clients6.google.com
+DOMAIN,generativelanguage.googleapis.com
+DOMAIN,makersuite.google.com
