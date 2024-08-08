@@ -46,8 +46,8 @@ static=苹果服务, 美国节点, 香港节点, 美国轮询, 台湾节点,日�
 ;static=哔哩哔哩, direct, 香港节点, 台湾节点,手动选择,  img-url=https://gitdl.cn/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/bilibili.png
 static=国际媒体, 全球加速, 香港节点, 台湾节点, 日本节点, 美国节点, 美国轮询, 新加坡节点,自动选择,手动选择,  proxy, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Streaming.png
 static=兜底分流, 全球加速, direct, 香港节点, 台湾节点, 日本节点, 新加坡节点, 美国节点,手动选择,  proxy, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Final.png
-static=Netflix, server-tag-regex=(?=.*(NF|奈飞|解锁|Netflix|netflix|NETFLIX|Media|流媒体|nf))^((?!(国内|海外)).)*$, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Netflix.png
-static=Spotify, 香港节点,自动选择,全球加速,手动选择,proxy,  img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Spotify.png
+static=Netflix, server-tag-regex=(?=.*(NF|奈飞|解锁|Netflix|netflix|NETFLIX|Media|流媒体|nf))^((?!(国内|海外)).)*$, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Netflix.png
+static=Spotify, 香港节点,自动选择,全球加速,手动选择,proxy,  img-url=https://gitdl.cn/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Spotify.png
 static=手动选择,server-tag-regex=^(.(?!(国内|海外)))*$,img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Manual.png
 
 
