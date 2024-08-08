@@ -1,95 +1,83 @@
-# > QuantumultX @ddgksf2013 设置推荐
-; 「通知」栏中，建议仅开启[策略检测通知]和[脚本通知]开关，「VPN」栏中，建议关闭[兼容性增强]、[分流匹配优化]和[MPM]开关
 
+# > QuantumultX https://mirror.ghproxy.com/ https://gitdl.cn/
 
-
-
+[general]
+# 建议只保留必要的通知设置
+# 例如：[策略检测通知]和[脚本通知]
 
 [rewrite_remote]
+# 会员解锁
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Bilibili.conf, tag=哔哩哔哩广告净化@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/YoutubeAds.conf, tag=油管去广告@Maasea, update-interval=86400, opt-parser=false, enabled=true
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/UnlockVip/Spotify.conf, tag=Spotify音乐VIP[音质≤高]@app2smile, update-interval=86400, opt-parser=false, enabled=true
+https://gitdl.cn/https://github.com/ddgksf2013/dev/raw/master/ForOwnUse.conf, tag=墨鱼专属VIP@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
 
-# ======= 会员解锁 ======= #
-https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Bilibili.conf, tag=哔哩哔哩广告净化@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
-https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/YoutubeAds.conf, tag=油管去广告@Maasea, update-interval=86400, opt-parser=false, enabled=true
-https://github.com/ddgksf2013/Rewrite/raw/master/UnlockVip/Spotify.conf, tag=Spotify音乐VIP[音质≤高]@app2smile, update-interval=86400, opt-parser=false, enabled=true
-https://github.com/ddgksf2013/dev/raw/master/ForOwnUse.conf, tag=墨鱼专属VIP@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
+# 广告净化
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Amap.conf, tag=高德地图净化[卸载重装]@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/StartUp.conf, tag=墨鱼去开屏2.0@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Applet.conf, tag=微信小程序去广告@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/script/zheye/zheye.snippet, tag=知乎去广告及体验增强@blackmatrix7, update-interval=86400, opt-parser=false, enabled=false
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Weibo.conf, tag=微博去广告@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
+https://gitdl.cn/https://github.com/app2smile/rules/raw/master/module/tieba-qx.conf, tag=百度贴吧去广告@app2smile, update-interval=86400, opt-parser=false, enabled=false
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Ximalaya.conf, tag=喜马拉雅去广告[卸载重装]@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
 
-
-# ======= 广告净化 ======= #
-https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/StartUp.conf, tag=墨鱼去开屏2.0@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/script/zheye/zheye.snippet, tag=知乎去广告及体验增强@blackmatrix7, update-interval=86400, opt-parser=false, enabled=true
-https://github.com/app2smile/rules/raw/master/module/tieba-qx.conf, tag=百度贴吧去广告@app2smile, update-interval=86400, opt-parser=false, enabled=false
-https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Applet.conf, tag=微信小程序去广告@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
-https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Weibo.conf, tag=微博去广告@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
-https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Ximalaya.conf, tag=喜马拉雅去广告[卸载重装]@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
-https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Amap.conf, tag=高德地图净化[卸载重装]@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
-https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Netease.conf, tag=网易云音乐去广告[卸载重装]@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
-https://gist.githubusercontent.com/ddgksf2013/beec132ca0c3570ffa0cf331bce8f82a/raw/baidumap.adblock.conf, tag=百度地图净化[卸载重装]@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
-
-
-# ======= 网页优化 ======= #
-https://github.com/ddgksf2013/Rewrite/raw/master/Html/WebAdBlock.conf, tag=影视网站去广告@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
-https://github.com/ddgksf2013/Rewrite/raw/master/Html/Q-Search.conf, tag=Safari超级搜索@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
-https://github.com/ddgksf2013/Rewrite/raw/master/Html/Douban.conf, tag=豆瓣网页观影快捷跳转@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
-https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/Html/General.conf, tag=神机重定向@DivineEngine, update-interval=86400, opt-parser=false, enabled=true
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Netease.conf, tag=网易云音乐去广告[卸载重装]@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
+https://gitdl.cn/https://gist.githubusercontent.com/ddgksf2013/beec132ca0c3570ffa0cf331bce8f82a/raw/baidumap.adblock.conf, tag=百度地图净化[卸载重装]@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
 
 
-# ======= 功能增强 ======= #
-https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/XiaoHongShu.conf, tag=小红书净化+去水印@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
-https://gist.githubusercontent.com/ddgksf2013/f43026707830c7818ee3ba624e383c8d/raw/baiduCloud.vip.js, tag=百度网盘净化+倍速@ddgksf2013, update-interval=86400, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/Function/UnblockURLinWeChat.conf, tag=微信解锁被屏蔽的URL@zZPiglet, update-interval=86400, opt-parser=false, enabled=true
+# 网页优化
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/Html/WebAdBlock.conf, tag=影视网站去广告@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/Html/General.conf, tag=神机重定向@DivineEngine, update-interval=86400, opt-parser=false, enabled=true
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/Html/Q-Search.conf, tag=Safari超级搜索@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/Html/Douban.conf, tag=豆瓣网页观影快捷跳转@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
 
+
+# 功能增强
+https://gitdl.cn/https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/Function/UnblockURLinWeChat.conf, tag=微信解锁被屏蔽的URL@zZPiglet, update-interval=86400, opt-parser=false, enabled=true
+https://gitdl.cn/https://gist.githubusercontent.com/ddgksf2013/f43026707830c7818ee3ba624e383c8d/raw/baiduCloud.vip.js, tag=百度网盘净化+倍速@ddgksf2013, update-interval=86400, opt-parser=true, enabled=true
+https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/XiaoHongShu.conf, tag=小红书净化+去水印@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
 
 
 
 [policy]
-static=OpenAi,美国节点,自动选择, 台湾轮询, 狮城轮询, 日本轮询, 美国轮询, 韩国轮询, 香港节点, 台湾节点, 日本节点, 狮城节点, 韩国节点,高速轮询, proxy, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/Color/OpenAI.png
-static=全球加速, 自动选择, direct, 香港轮询, 台湾轮询, 狮城轮询, 日本轮询, 美国轮询, 韩国轮询, 香港节点, 台湾节点, 日本节点, 狮城节点, 美国节点,韩国节点,高速轮询, proxy, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/Global.png
-static=苹果服务, direct, 香港节点, 台湾节点, 美国节点, 日本节点, 狮城节点,韩国节点,高速轮询, proxy, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple.png
-static=哔哩哔哩, direct, 香港节点, 台湾节点, 高速轮询,img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/bilibili.png
-static=国际媒体, 自动选择,  direct,香港轮询, 台湾轮询, 狮城轮询, 日本轮询, 美国轮询, 韩国轮询, 香港节点, 台湾节点, 日本节点, 美国节点, 狮城节点,韩国节点,高速轮询, proxy, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/Streaming.png
-static=兜底分流, 自动选择, 全球加速, direct, 香港节点, 台湾节点, 日本节点, 狮城节点, 美国节点,韩国节点,高速轮询, proxy, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/Final.png
+static=OpenAI, 美国节点, 自动选择,手动选择, proxy, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/OpenAI.png
+static=全球加速, 自动选择, 手动选择, 美国轮询,  direct, 香港节点, 台湾节点, 日本节点, 新加坡节点, 美国节点, proxy, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Global.png
+static=苹果服务, 美国节点, 香港节点, 美国轮询, 台湾节点,日本节点, 新加坡节点,手动选择, proxy,direct,  img-url=https://gitdl.cn/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple.png
+static=哔哩哔哩, direct, 香港节点, 台湾节点,手动选择,  img-url=https://gitdl.cn/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/bilibili.png
+static=国际媒体, 全球加速, 香港节点, 台湾节点, 日本节点, 美国节点,  美国轮询, 新加坡节点,手动选择,  proxy, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Streaming.png
+static=兜底分流, 全球加速, direct, 香港节点, 台湾节点, 日本节点, 新加坡节点, 美国节点,手动选择,  proxy, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Final.png
+static=手动选择,server-tag-regex=^(.(?!(国内|海外)))*$,img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Manual.png
+
 
 #默认设置30分钟测速一次，可自行修改check-interval=后面的数值（单位：秒），tolerance=后面的数值不建议修改
 #将下面的url-latency-benchmark的内容替换成static，并删除[check-interval=1800, tolerance=0, ]即可手动选择节点
-url-latency-benchmark=自动选择, server-tag-regex=^(.(?!(网易|墨鱼)))*$, check-interval=1800, tolerance=0, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png
-url-latency-benchmark=香港节点, server-tag-regex=(?=.*(港|香港|HK|(?i)Hong|MO|MFM|HKG))^((?!(台|日|韩|新|美|国内|海外)).)*$, check-interval=1800, tolerance=0, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/HK.png
-url-latency-benchmark=台湾节点, server-tag-regex=(?=.*(台|TW|(?i)Taiwan|新北|彰化|TPE|KHH))^((?!(港|日|韩|新|美|国内|海外)).)*$, check-interval=1800, tolerance=0, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/TW.png
-url-latency-benchmark=日本节点, server-tag-regex=(?=.*(日|JP|(?i)Japan|川日|东京|大阪|泉日|埼玉|沪日|深日|日本|Tokyo|NRT|KIX))^((?!(港|台|韩|新|美|国内|海外)).)*$, check-interval=1800, tolerance=0, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/JP.png
-url-latency-benchmark=狮城节点, server-tag-regex=(?=.*(新|SG|狮|獅|(?i)Singapore|新加坡|坡|狮城|SIN))^((?!(港|台|日|韩|美|国内|海外)).)*$, check-interval=1800, tolerance=0, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/SG.png
-url-latency-benchmark=美国节点, server-tag-regex=(?=.*(美|US|(?i)States|American|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|ATL|BUF|DFW|EWR|IAD|LAX|MCI|MIA|ORD|PHX|PDX|SEA|SJC))^((?!(港|台|日|韩|新|国内|海外|免费)).)*$, check-interval=1800, tolerance=0, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/US.png
-url-latency-benchmark=韩国节点, server-tag-regex=(?=.*(韩|KR|(?i)Korea|韩|KOR|Seoul|首尔|春川|韓|ICN))^((?!(台|日|港|新|美|国内|海外)).)*$, check-interval=1800, tolerance=0, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/KR.png
+
+url-latency-benchmark=自动选择, server-tag-regex=^(.(?!(国内|海外)))*$, check-interval=1800, tolerance=0, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png
+url-latency-benchmark=香港节点, server-tag-regex=(?=.*(港|HK|(?i)Hong))^((?!(台|日|韩|新|美|国内|海外)).)*$, check-interval=1800, tolerance=0, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/HK.png
+url-latency-benchmark=台湾节点, server-tag-regex=(?=.*(台|TW|(?i)Taiwan))^((?!(港|日|韩|新|美|国内|海外)).)*$, check-interval=1800, tolerance=0, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/TW.png
+url-latency-benchmark=日本节点, server-tag-regex=(?=.*(日|JP|(?i)Japan))^((?!(港|台|韩|新|美|国内|海外)).)*$, check-interval=1800, tolerance=0, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/JP.png
+url-latency-benchmark=新加坡节点, server-tag-regex=(?=.*(新|狮|獅|SG|(?i)Singapore))^((?!(港|台|日|韩|美|国内|海外)).)*$, check-interval=1800, tolerance=0, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/SG.png
+url-latency-benchmark=美国节点, server-tag-regex=(?=.*(美|US|(?i)States|American))^((?!(港|台|日|韩|新|国内|海外)).)*$, check-interval=1800, tolerance=0, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/US.png
 
 #默认设置负载均衡轮询
-round-robin=香港轮询, resource-tag-regex=.*, server-tag-regex=HK|香港|Hong|MO|MFM|HKG, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png
-round-robin=台湾轮询, resource-tag-regex=.*, server-tag-regex=TW|Taiwan|台湾|新北|彰化|TPE|KHH, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/TW.png
-round-robin=狮城轮询, resource-tag-regex=.*, server-tag-regex=SG|Singapore|新加坡|坡|狮城|SIN, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png
-round-robin=日本轮询, resource-tag-regex=.*, server-tag-regex=JP|Japan|川日|东京|大阪|泉日|埼玉|沪日|深日|日本|Tokyo|NRT|KIX, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png
-round-robin=美国轮询, resource-tag-regex=.*, server-tag-regex=(?=.*(美|US|(?i)States|American|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|ATL|BUF|DFW|EWR|IAD|LAX|MCI|MIA|ORD|PHX|PDX|SEA|SJC))^((?!(港|台|日|韩|新|国内|海外)).)*$,img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/US.png
-round-robin=韩国轮询, resource-tag-regex=.*, server-tag-regex=KR|韩|ICN|KOR|Seoul|首尔|春川|韓|Korea, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/KR.png
-round-robin=高速轮询, resource-tag-regex=.*, server-tag-regex=(?=.*(高速|稳定))^((?!(国内|海外|港)).)*$, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Bot.png
-
-
-
+round-robin=美国轮询, server-tag-regex=(?=.*(美|US|(?i)States|American))^((?!(港|台|日|韩|新|国内|海外)).)*$,img-url=https://gitdl.cn/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png
 
 [filter_remote]
-
-https://raw.githubusercontent.com/ddgksf2013/Filter/master/Unbreak.list, tag=规则修正, force-policy=direct, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/OpenAI/OpenAI.list, tag=OpenAi, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/hiven425/hiven/main/config/AI.list, tag=OpenAi, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/hiven425/hiven/main/config/Direct.list, tag=国内网站, force-policy=direct, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/hiven425/hiven/main/config/ProxyLite.list, tag=全球加速, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/Cats-Team/AdRules/main/qx.conf, tag=广告终结者, force-policy=reject, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/WeChat/WeChat.list, tag=微信直连, force-policy=direct, update-interval=172800, opt-parser=false, enabled=true
-https://raw.githubusercontent.com/VirgilClyne/GetSomeFries/main/ruleset/ASN.China.list, tag=国内网站, force-policy=direct, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/ddgksf2013/Filter/master/StreamingSE.list, tag=哔哩哔哩, force-policy=哔哩哔哩, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/ConnersHua/RuleGo/master/Surge/Ruleset/Proxy.list, tag=全球加速, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/ddgksf2013/Filter/master/Streaming.list, tag=国际媒体, force-policy=国际媒体, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Apple/Apple.list, tag=苹果服务, force-policy=苹果服务, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/ddgksf2013/Filter/master/GoogleVoice.list, tag=Google Voice, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Spotify/Spotify.list, tag=Spotify音乐, force-policy=香港节点, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/TikTok/TikTok.list, tag=海外抖音, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=true
-
-
+https://gitdl.cn/https://raw.githubusercontent.com/ddgksf2013/Filter/master/Unbreak.list, tag=规则修正, force-policy=direct, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/Cats-Team/AdRules/main/qx.conf, tag=广告终结者, force-policy=reject, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/WeChat/WeChat.list, tag=微信直连, force-policy=direct, update-interval=172800, opt-parser=false, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/hiven425/hiven/main/config/AI.list, tag=OpenAi, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/OpenAI/OpenAI.list, tag=OpenAi, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Spotify/Spotify.list, tag=Spotify音乐, force-policy=香港节点, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/hiven425/hiven/main/config/Direct.list, tag=国内网站, force-policy=direct, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/VirgilClyne/GetSomeFries/main/ruleset/ASN.China.list, tag=国内网站, force-policy=direct, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/hiven425/hiven/main/config/ProxyLite.list, tag=全球加速, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/ConnersHua/RuleGo/master/Surge/Ruleset/Proxy.list, tag=全球加速, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/ddgksf2013/Filter/master/Streaming.list, tag=国际媒体, force-policy=国际媒体, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Apple/Apple.list, tag=苹果服务, force-policy=苹果服务, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/ddgksf2013/Filter/master/StreamingSE.list, tag=哔哩哔哩, force-policy=哔哩哔哩, update-interval=172800, opt-parser=true, enabled=false
+https://gitdl.cn/https://raw.githubusercontent.com/ddgksf2013/Filter/master/GoogleVoice.list, tag=Google Voice, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=false
+https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/TikTok/TikTok.list, tag=海外抖音, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=false
 
 
 
