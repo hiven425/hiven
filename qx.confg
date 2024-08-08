@@ -43,9 +43,11 @@ https://gitdl.cn/https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/XiaoHo
 static=OpenAI, 美国节点, 自动选择,手动选择, proxy, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/OpenAI.png
 static=全球加速, 自动选择, 手动选择, 美国轮询,  direct, 香港节点, 台湾节点, 日本节点, 新加坡节点, 美国节点, proxy, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Global.png
 static=苹果服务, 美国节点, 香港节点, 美国轮询, 台湾节点,日本节点, 新加坡节点,手动选择, proxy,direct,  img-url=https://gitdl.cn/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple.png
-static=哔哩哔哩, direct, 香港节点, 台湾节点,手动选择,  img-url=https://gitdl.cn/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/bilibili.png
-static=国际媒体, 全球加速, 香港节点, 台湾节点, 日本节点, 美国节点,  美国轮询, 新加坡节点,手动选择,  proxy, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Streaming.png
+;static=哔哩哔哩, direct, 香港节点, 台湾节点,手动选择,  img-url=https://gitdl.cn/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/bilibili.png
+static=国际媒体, 全球加速, 香港节点, 台湾节点, 日本节点, 美国节点, 美国轮询, 新加坡节点,自动选择,手动选择,  proxy, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Streaming.png
 static=兜底分流, 全球加速, direct, 香港节点, 台湾节点, 日本节点, 新加坡节点, 美国节点,手动选择,  proxy, img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Final.png
+static=Netflix, server-tag-regex=(?=.*(NF|奈飞|解锁|Netflix|netflix|NETFLIX|Media|流媒体|nf))^((?!(国内|海外)).)*$, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Netflix.png
+static=Spotify, 香港节点,自动选择,全球加速,手动选择,proxy,  img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Spotify.png
 static=手动选择,server-tag-regex=^(.(?!(国内|海外)))*$,img-url=https://gitdl.cn/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Manual.png
 
 
@@ -68,16 +70,16 @@ https://gitdl.cn/https://raw.githubusercontent.com/Cats-Team/AdRules/main/qx.con
 https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/WeChat/WeChat.list, tag=微信直连, force-policy=direct, update-interval=172800, opt-parser=false, enabled=true
 https://gitdl.cn/https://raw.githubusercontent.com/hiven425/hiven/main/config/AI.list, tag=OpenAi, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
 https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/OpenAI/OpenAI.list, tag=OpenAi, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
-https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Spotify/Spotify.list, tag=Spotify音乐, force-policy=香港节点, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Spotify/Spotify.list, tag=Spotify音乐, force-policy=Spotify, update-interval=172800, opt-parser=true, enabled=true
+https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Netflix/Netflix.list, tag=Netflix, force-policy=Netflix, update-interval=172800, opt-parser=true, enabled=false
 https://gitdl.cn/https://raw.githubusercontent.com/hiven425/hiven/main/config/Direct.list, tag=国内网站, force-policy=direct, update-interval=172800, opt-parser=true, enabled=true
 https://gitdl.cn/https://raw.githubusercontent.com/VirgilClyne/GetSomeFries/main/ruleset/ASN.China.list, tag=国内网站, force-policy=direct, update-interval=172800, opt-parser=true, enabled=true
 https://gitdl.cn/https://raw.githubusercontent.com/hiven425/hiven/main/config/ProxyLite.list, tag=全球加速, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=true
 https://gitdl.cn/https://raw.githubusercontent.com/ConnersHua/RuleGo/master/Surge/Ruleset/Proxy.list, tag=全球加速, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=true
 https://gitdl.cn/https://raw.githubusercontent.com/ddgksf2013/Filter/master/Streaming.list, tag=国际媒体, force-policy=国际媒体, update-interval=172800, opt-parser=true, enabled=true
 https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Apple/Apple.list, tag=苹果服务, force-policy=苹果服务, update-interval=172800, opt-parser=true, enabled=true
-https://gitdl.cn/https://raw.githubusercontent.com/ddgksf2013/Filter/master/StreamingSE.list, tag=哔哩哔哩, force-policy=哔哩哔哩, update-interval=172800, opt-parser=true, enabled=false
+;https://gitdl.cn/https://raw.githubusercontent.com/ddgksf2013/Filter/master/StreamingSE.list, tag=哔哩哔哩, force-policy=哔哩哔哩, update-interval=172800, opt-parser=true, enabled=false
 https://gitdl.cn/https://raw.githubusercontent.com/ddgksf2013/Filter/master/GoogleVoice.list, tag=Google Voice, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=false
 https://gitdl.cn/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/TikTok/TikTok.list, tag=海外抖音, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=false
-
 
 
