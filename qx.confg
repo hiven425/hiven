@@ -4,7 +4,9 @@
 [general]
 # 建议只保留必要的通知设置
 # 例如：[策略检测通知]和[脚本通知]
-
+resource_parser_url=https://raw.githubusercontent.com/KOP-XIAO/QuantumultX/master/Scripts/resource-parser.js
+#备用资源解析器
+;resource_parser_url=https://fastly.jsdelivr.net/gh/KOP-XIAO/QuantumultX@master/Scripts/resource-parser.js
 [rewrite_remote]
 # 会员解锁
 https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Bilibili.conf, tag=哔哩哔哩广告净化@ddgksf2013, update-interval=86400, opt-parser=false, enabled=true
@@ -23,6 +25,12 @@ https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Ximalaya.conf, tag=喜�
 
 https://github.com/ddgksf2013/Rewrite/raw/master/AdBlock/Netease.conf, tag=网易云音乐去广告[卸载重装]@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
 https://gist.githubusercontent.com/ddgksf2013/beec132ca0c3570ffa0cf331bce8f82a/raw/baidumap.adblock.conf, tag=百度地图净化[卸载重装]@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
+https://raw.githubusercontent.com/githubdulong/Script/master/jd_price2.sgmodule, tag=京东历史价格, update-interval=172800, opt-parser=true, enabled=true
+https://raw.githubusercontent.com/NobyDa/Script/master/Surge/Module/TestFlightDownload.sgmodule, tag=解除 TF 限制, update-interval=172800, opt-parser=true, enabled=false
+https://raw.githubusercontent.com/fmz200/wool_scripts/main/QuantumultX/rewrite/cleanup.snippet, tag=小程序净化, update-interval=172800, opt-parser=false, enabled=true
+
+
+
 
 
 # 网页优化
@@ -81,3 +89,13 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Quant
 ;https://raw.githubusercontent.com/ddgksf2013/Filter/master/StreamingSE.list, tag=哔哩哔哩, force-policy=哔哩哔哩, update-interval=172800, opt-parser=true, enabled=false
 https://raw.githubusercontent.com/ddgksf2013/Filter/master/GoogleVoice.list, tag=Google Voice, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=false
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/TikTok/TikTok.list, tag=海外抖音, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=false
+# NobyDa大佬去广告 -默认关闭，自行手动启用！
+https://raw.githubusercontent.com/NobyDa/Script/master/QuantumultX/AdRule.list, tag=🛑重度广告拦截-拒绝, force-policy=reject, update-interval=172800, opt-parser=false, enabled=false
+# Privacy 隐私
+https://raw.githubusercontent.com/w37fhy/QuantumultX/master/Rules/Tracking.list, tag=🛑隐私保护-拒绝, force-policy=reject, update-interval=172800, opt-parser=true, enabled=true
+# Hijacking 运营商劫持或恶意网站
+https://raw.githubusercontent.com/w37fhy/QuantumultX/master/Rules/Hijacking.list, tag=🛑运营商劫持-拒绝, force-policy=reject, update-interval=172800, opt-parser=true, enabled=true
+# Unbreak 后续规则修正
+https://raw.githubusercontent.com/w37fhy/QuantumultX/master/Rules/Unbreak.list, tag=🎯规则修正-直连, force-policy=direct, update-interval=172800, opt-parser=true, enabled=true
+# Advertising 广告
+https://raw.githubusercontent.com/w37fhy/QuantumultX/master/Rules/Advertising.list, tag=🛑轻量广告拦截-拒绝, force-policy=reject, update-interval=172800, opt-parser=true, enabled=true
