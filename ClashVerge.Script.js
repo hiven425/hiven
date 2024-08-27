@@ -24,6 +24,12 @@ function main(params) {
 //覆写规则
 function overwriteRules(params) {
     const rules = [
+        "RULE-SET,OpenAI,US-自动选择",
+        "RULE-SET,Claude,US-自动选择",
+        "DOMAIN-SUFFIX,openai.com,US-自动选择",
+        "DOMAIN-SUFFIX,ai.com,US-自动选择",
+        "DOMAIN-SUFFIX,anthropic.com,US-自动选择",
+        "DOMAIN-SUFFIX,claude.ai,US-自动选择",
         "RULE-SET,reject,⛔广告拦截",
         "RULE-SET,direct,DIRECT",
         "RULE-SET,cncidr,DIRECT",
@@ -40,18 +46,18 @@ function overwriteRules(params) {
         "RULE-SET,greatfire," + proxyName,
         "RULE-SET,telegramcidr," + proxyName,
         "RULE-SET,proxy," + proxyName,
-        // OpenAI and other specific rules
         "GEOSITE,microsoft@cn,DIRECT",
         "GEOSITE,openai,🦖AI",
-        "RULE-SET,OpenAI,🦖AI",
         "DOMAIN,servd-anthropic-website.b-cdn.net,US-自动选择",
         "DOMAIN,cdn.usefathom.com,US-自动选择",
-        "DOMAIN-SUFFIX,anthropic.com,US-自动选择",
-        "DOMAIN-SUFFIX,claude.ai,US-自动选择",
         "DOMAIN-SUFFIX,generativelanguage.googleapis.com,US-自动选择",
+        "DOMAIN-SUFFIX,amplitude.com,US-自动选择",
         "DOMAIN-SUFFIX,linux.do,DIRECT",
         "DOMAIN-SUFFIX,fuclaude.com,DIRECT",
         "DOMAIN-SUFFIX,oaifree.com,DIRECT",
+        "DOMAIN-SUFFIX,winnermedical.com,DIRECT",
+        "DOMAIN-SUFFIX,.pureh2b.com,DIRECT",
+        "IP-CIDR,192.168.206.220/32,DIRECT",
         "MATCH,🐟漏网之鱼",
     ];
     const ruleProviders = {
@@ -67,6 +73,13 @@ function overwriteRules(params) {
             behavior: "classical",
             url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OpenAI/OpenAI.yaml",
             path: "./ruleset/OpenAI.yaml",
+            interval: 86400
+        },
+        Claude: {
+            type: "http",
+            behavior: "classical",
+            url: "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Claude/Claude.yaml",
+            path: "./ruleset/Claude.yaml",
             interval: 86400
         },
         icloud: {
@@ -170,11 +183,11 @@ function overwriteProxyGroups(params) {
     const allProxies = params["proxies"].map((e) => e.name);
     // 自动选择代理组，按地区分组选延迟最低
     const autoProxyGroupRegexs = [
-        { name: "HK-自动选择", regex: /香港|HK|Hong|🇭🇰/ },
-        { name: "TW-自动选择", regex: /台湾|TW|Taiwan|Wan|🇨🇳|🇹🇼/ },
-        { name: "SG-自动选择", regex: /新加坡|狮城|SG|Singapore|🇸🇬/ },
-        { name: "JP-自动选择", regex: /日本|JP|Japan|🇯🇵/ },
-        { name: "US-自动选择", regex: /美国|US|United States|America|🇺🇸/ },
+        { name: "HK-自动选择", regex: /香港|HK|hk|Hong|🇭🇰/ },
+        { name: "TW-自动选择", regex: /台湾|TW|tw|Taiwan|Wan|🇨🇳|🇹🇼/ },
+        { name: "SG-自动选择", regex: /新加坡|新|狮城|SG|sg|Singapore|🇸🇬/ },
+        { name: "JP-自动选择", regex: /日本|JP|jp|Japan|🇯🇵/ },
+        { name: "US-自动选择", regex: /美国|US|us|United States|America|🇺🇸/ },
     ];
 
     const autoProxyGroups = autoProxyGroupRegexs
