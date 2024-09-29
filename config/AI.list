@@ -30,19 +30,6 @@ DOMAIN-SUFFIX,deepmind.com
 DOMAIN-SUFFIX,deepmind.google
 DOMAIN-SUFFIX,generativeai.google
 DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com
-# talkatone
-DOMAIN-SUFFIX,inmobi.com
-DOMAIN-SUFFIX,mobilefuse.com
-DOMAIN-SUFFIX,talkatone.com
-DOMAIN-SUFFIX,tenor.com
-DOMAIN-SUFFIX,crashlytics.com
-DOMAIN-SUFFIX,kochava.com
-DOMAIN-SUFFIX,cohere.com
-DOMAIN-SUFFIX,ip-api.com
-DOMAIN-SUFFIX,agkn.com
-DOMAIN-SUFFIX,tktn.at
-DOMAIN-SUFFIX,tktn.be
-DOMAIN-SUFFIX,spadsync.com
 
 #DOMAIN
 DOMAIN,cdn.usefathom.com
@@ -50,9 +37,4 @@ DOMAIN,ai.google.dev
 DOMAIN,alkalimakersuite-pa.clients6.google.com
 DOMAIN,generativelanguage.googleapis.com
 DOMAIN,makersuite.google.com
-# talkatone
-IP-CIDR,50.117.27.0/24
-IP-CIDR,69.46.75.0/24
-IP-CIDR,205.164.56.0/24
-IP-CIDR,63.251.124.0/24
-IP-CIDR,205.164.56.29/24
+
