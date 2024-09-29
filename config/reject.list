@@ -11,3 +11,7 @@ DOMAIN-KEYWORD,googleads
 DOMAIN-SUFFIX,adsappier.com
 DOMAIN-SUFFIX,appier.net
 DOMAIN-SUFFIX,appiersig.com
+
+DOMAIN-SUFFIX=ads.talkatone.com
+DOMAIN-SUFFIX=tracking.talkatone.com
+DOMAIN-SUFFIX=analytics.talkatone.com
