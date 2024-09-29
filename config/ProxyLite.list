@@ -33,3 +33,5 @@ IP-CIDR,208.67.220.220/32,no-resolve
 DOMAIN-SUFFIX,keeflys.com
 #cloudflare
 DOMAIN-SUFFIX,cloudflare.com
+#Talkatone
+DOMAIN-SUFFIX,tktn.be
