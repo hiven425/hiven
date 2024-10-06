@@ -92,10 +92,10 @@ function overwriteRules(params) {
             path: "./ruleset/icloud.yaml",
             interval: 86400,
         },
-      facebook: {
+       facebook: {
         type: "http",
-     behavio: "classical",
-     ur: "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Facebook/Facebook.yaml",
+     behavior: "classical",
+     url: "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Facebook/Facebook.yaml",
       path: "./ruleset/blackmatrix7/facebook.yaml",
       interval: 86400,
 
