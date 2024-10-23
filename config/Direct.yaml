@@ -5,3 +5,7 @@ payload:
   - DOMAIN-SUFFIX,fuclaude.com
   - DOMAIN-SUFFIX,oaifree.com
   - DOMAIN-SUFFIX,linux.do
+  - DOMAIN-KEYWORD,linux.do
+  - DOMAIN-KEYWORD,winnermedical.com
+  - DOMAIN-KEYWORD,fuclaude.com
+  - DOMAIN-KEYWORD,oaifree.com
