@@ -1,0 +1,174 @@
+dns:
+  enable: true
+  listen: 127.0.0.1:1053  # 本地监听增加安全性
+  ipv6: false  # 保持IPv6支持国内服务
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16  
+  fake-ip-filter-mode: blacklist
+  
+  # DNS防泄漏保护
+  default-nameserver:
+    - 223.5.5.5:53     # 阿里DNS
+    - 119.29.29.29:53  # 腾讯DNS
+    - 1.1.1.1       # Cloudflare
+    
+  # 分层DNS服务器
+  nameserver:
+    # 国内DNS优先，减少延迟
+    - https://dns.alidns.com/dns-query#h3=true,no-check-certificate
+    - https://doh.pub/dns-query#h3=true,no-check-certificate
+    # 国际DNS备用
+    - https://dns.cloudflare.com/dns-query#h3=true
+    - tls://1.1.1.1:853
+    - https://security.cloudflare-dns.com/dns-query#h3=true  # Cloudflare安全DNS
+    
+  # 可信的备用DNS
+  fallback:
+    - https://security.cloudflare-dns.com/dns-query#h3=true
+    - tls://1.1.1.1:853
+    - https://dns.google/dns-query#h3=true
+  
+  fake-ip-filter:
+   # 系统和本地服务
+    - "*.local"
+    - "*.localhost"
+    - "*.test"
+    - "*.lan"
+    - "*.localdomain"
+    - "*.example"
+    - "*.invalid"
+    - "*.internal"
+    
+    # 常用
+    - "*.lanzou.com"         
+    - "*.winnermedical.com"  
+    - "*.fuclaude.com"       
+    - "*.oaifree.com"        
+    - "*.linux.do"
+
+  # 关键服务（需要真实IP）
+    - "+.qq.com"
+    - "+.weixin.qq.com"
+    - "+.tencent.com"
+    - "+.baidu.com"
+    - "+.bdstatic.com"
+    - "+.alipay.com"
+    - "+.taobao.com"
+    - "+.tmall.com"
+    - "+.aliyun.com"
+    
+    # AI服务域名（防止服务异常）
+    - "*.openai.com"
+    - "*.auth0.com"
+    - "*.anthropic.com"
+    - "*.claude.ai"
+    - "*.api.anthropic.com"
+    - "*.hcaptcha.com"
+    - "*.intercom.io"
+    - "*.oaistatic.com"
+    - "*.sentry.io"
+    - "*.huggingface.co"
+    - "*.replicate.com"
+    - "*.together.ai"
+    - "*.cohere.ai"
+    - "*.perplexity.ai"
+    - "*.mistral.ai"
+    - "*.gemini.google.com"
+    - "*.cursor.so"
+    - "*.cursor.sh"
+    
+    # 开发相关（保证功能正常）
+    - "*.github.com"
+    - "*.githubusercontent.com"
+    - "*.ghcr.io"
+    - "*.githubassets.com"
+    - "*.gitlab.com"
+    - "*.cloudflare.com"
+    - "*.docker.com"
+    - "*.docker.io"
+    - "*.npmjs.com"
+    - "*.pypi.org"
+    - "*.visualstudio.com"
+    - "*.jetbrains.com"
+    
+    # 防止DNS泄露的关键域名
+    - "*.doh.pub"
+    - "*.dot.pub"
+    - "*.dns.pub"
+    - "*.dns.alidns.com"
+    - "*.dns.google"
+    - "*.cloudflare-dns.com"
+    - "*.dns.quad9.net"
+    - "+.ntp.org"
+    - "+.pool.ntp.org"
+    
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    domain:
+      # AI服务使用国际DNS
+      - '+.openai.com'
+      - '+.anthropic.com'
+      - '+.claude.ai'
+      - '+.huggingface.co'
+      - '+.replicate.com'
+      - '+.together.ai'
+      - '+.cohere.ai'
+      - '+.perplexity.ai'
+      - '+.mistral.ai'
+      
+      # 开发平台使用国际DNS
+      - '+.github.com'
+      - '+.githubusercontent.com'
+      - '+.gitlab.com'
+      - '+.docker.com'
+      - '+.npmjs.com'
+      - '+.pypi.org'
+      
+      # 默认国外域名
+      - 'geosite:geolocation-!cn'
+    
+    # 保护隐私的IP过滤
+    ipcidr:
+      - 0.0.0.0/8
+      - 10.0.0.0/8
+      - 100.64.0.0/10
+      - 127.0.0.0/8
+      - 169.254.0.0/16
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - 224.0.0.0/4
+      - 240.0.0.0/4
+
+  # 针对性的DNS策略
+  nameserver-policy:
+    # 国内服务用国内DNS    
+    'DOMAIN-SUFFIX,qq.com,DOMAIN-SUFFIX,weixin.qq.com,DOMAIN-SUFFIX,tencent.com':
+      - https://doh.pub/dns-query#h3=true
+      - 119.29.29.29
+    # 阿里系服务
+    'DOMAIN-SUFFIX,alipay.com,DOMAIN-SUFFIX,taobao.com,DOMAIN-SUFFIX,tmall.com,DOMAIN-SUFFIX,aliyun.com':
+      - https://dns.alidns.com/dns-query#h3=true
+      - 223.5.5.5
+    # AI和开发服务用加密DNS
+    'DOMAIN-SUFFIX,openai.com,DOMAIN-SUFFIX,anthropic.com,DOMAIN-SUFFIX,claude.ai':
+      - https://security.cloudflare-dns.com/dns-query#h3=true
+      - tls://1.1.1.1:853
+    
+    'DOMAIN-SUFFIX,github.com,DOMAIN-SUFFIX,githubusercontent.com,DOMAIN-SUFFIX,gitlab.com':
+      - https://security.cloudflare-dns.com/dns-query#h3=true
+      - tls://dns.google:853
+
+  # 性能和安全优化
+  timeout: 3
+  concurrent: true
+  cache-size: 20000
+  independent-cache: true
+  prefetch-domain: true
+  enable-private-ip: true  # 支持国内服务
+  prefer-h3: true
+  
+  # 代理服务器DNS（使用加密DNS）
+  proxy-server-nameserver:
+    - https://security.cloudflare-dns.com/dns-query#h3=true
+    - tls://dns.google:853
