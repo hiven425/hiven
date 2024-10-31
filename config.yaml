@@ -175,7 +175,7 @@ rules:
   - RULE-SET,google_domain,🍀 Google 
   - RULE-SET,onedrive_domain,🚀 节点选择
   - RULE-SET,microsoft_domain,🚀 节点选择
-  - RULE-SET,cloudflare,☁️ cloudflare
+  - RULE-SET,cloudflare_domain,☁️ cloudflare
   - RULE-SET,tiktok_domain,🎵 TikTok
   - RULE-SET,speedtest_domain,✈️ Speedtest
   - RULE-SET,telegram_domain,📲 Telegram
