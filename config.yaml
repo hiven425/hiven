@@ -123,46 +123,59 @@ proxies:
   udp: true
  
 # 锚点
-pr: &pr {type: select, proxies: [🚀 节点选择,⭐故转,🌐均衡,  🇯🇵日本自动, 🇺🇲美国自动, ♻️自动选择,🇯🇵日本节点, 🇺🇲美国节点,  🇺🇲美国故转,🌐全部节点, 直连]}
-us: &us {type: select, proxies: [ 🇺🇲美国自动,  🇺🇲美国节点, 🇺🇲美国故转,🌐全部节点, 直连]}
+pr: &pr {type: select, proxies: [🚀 节点选择, ⭐ 故转,🌐 均衡,🇺🇲 美国均衡,🇸🇬 加坡故转,🇯🇵 日本故转,🇺🇲 美国故转,🇯🇵 日本节点,🇺🇲 美国节点,🇸🇬 加坡自动,🇭🇰 香港自动,🇺🇲 美国自动,♻️ 自动选择,DIRECT]}
+us: &us {type: select, proxies: [🇺🇲 美国故转,🇺🇲 美国均衡,🇺🇲 美国自动,♻️ 自动选择, DIRECT]}
 # 策略组
 proxy-groups:
-  - {name: 🚀 节点选择, type: select, proxies: [⭐故转,🌐均衡,  🇯🇵日本自动, 🇺🇲美国自动, ♻️自动选择,🇯🇵日本节点, 🇺🇲美国节点,  🇺🇲美国故转,🌐全部节点, 直连]}
+  - {name: 🚀 节点选择, type: select, proxies: [⭐ 故转,🌐 均衡,🇺🇲 美国均衡,🇸🇬 加坡故转,🇯🇵 日本故转,🇺🇲 美国故转,🇯🇵 日本节点,🇺🇲 美国节点,🇸🇬 加坡自动,🇭🇰 香港自动,🇺🇲 美国自动,♻️ 自动选择,DIRECT]}
   - {name: 📹 YouTube,!!merge <<: *pr}
   - {name: 🍀 Google,!!merge <<: *pr}
   - {name: 🤖 ChatGPT,!!merge <<: *us}
   - {name: 👨🏿‍💻 GitHub,!!merge <<: *pr}
-  - {name: 🐬 OneDrive,!!merge <<: *pr}
+  - {name: 🐬 外贸,!!merge <<: *pr}
   - {name: 🪟 Microsoft,!!merge <<: *pr}
   - {name: 🎵 TikTok,!!merge <<: *pr}
   - {name: 📲 Telegram,!!merge <<: *pr}
   - {name: 🎥 NETFLIX,!!merge <<: *pr}
   - {name: ✈️ Speedtest,!!merge <<: *pr}
   - {name: 💶 PayPal,!!merge <<: *pr}
-  - {name: 🍎 Apple, type: select, proxies: [直连, 🚀 节点选择]}
-  - {name: 🎯 全球直连, type: select, proxies: [直连, 🚀 节点选择]}
+  - {name: 🍎 Apple, type: select, proxies: [DIRECT, 🚀 节点选择]}
+  - {name: 🎯 全球直连, type: select, proxies: [DIRECT, 🚀 节点选择]}
   - {name: 🐟 漏网之鱼,!!merge <<: *pr}
-  - {name: 🇯🇵日本节点, type: select, include-all: true, filter: "(?i)日|jp|japan"}
-  - {name: 🇺🇲美国节点, type: select, include-all: true, filter: "(?i)美|us|unitedstates|united states"}
-  - {name: 🇺🇲美国故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|us|unitedstates|united states|United States))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
-  - {name: ⭐故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$" }
-  - {name: 🌐均衡, type: load-balance, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$" }
-  - {name: 🇯🇵日本自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(日|JP|(?i)Japan))^((?!(港|台|韩|新|美|家宽|游戏|剩余|国内|海外|官网)).)*$" }
-  - {name: 🇺🇲美国自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|US|(?i)States|America))^((?!(港|台|日|韩|新|家宽|游戏|剩余|国内|海外|官网)).)*$"}
-  - {name: ♻️自动选择, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(直连|家宽|游戏|剩余|国内|海外|官网)).)*$"}
-  - {name: 🌐全部节点, type: select, include-all: true}
+
+  # 节点筛选
+  - {name: 🇸🇬 加坡故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(新加坡|坡|狮城|SG|sg|SIN|Singapore))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
+  - {name: 🇯🇵 日本故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(日|东京|大阪|埼玉|JP|NRT|KIX|FUK|(?i)Japan))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
+  - {name: 🇺🇲 美国故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|us|US|(?i)States|America))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
+  - {name: ⭐ 故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$" }
+  
+  - {name: 🌐 均衡, type: load-balance, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$" }
+  - {name: 🇺🇲 美国均衡, type: load-balance, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|us|unitedstates|united states|United States))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
+
+  - {name: 🇯🇵 日本自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(日|东京|大阪|埼玉|JP|NRT|KIX|FUK|(?i)Japan)))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$" }
+  - {name: 🇸🇬 加坡自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(新加坡|坡|狮城|SG|sg|SIN|Singapore))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
+  - {name: 🇭🇰 香港自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(香港|HK|Hong Kong|🇭🇰|HongKong|HKG))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
+  - {name: 🇺🇲 美国自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|us|US|(?i)States|America))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
+  
+  - {name: ♻️ 自动选择, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(直连|家宽|游戏|剩余|国内|海外|官网)).)*$"}
+  
 rules:
-  - RULE-SET,private_domain,直连
-  - RULE-SET,my_direct,直连
+  - RULE-SET,private_domain,DIRECT
+  - RULE-SET,my_direct,DIRECT
   - RULE-SET,apple_domain,🍎 Apple
   - RULE-SET,my_proxylite,🚀 节点选择
   - RULE-SET,my_ai,🤖 ChatGPT
   - RULE-SET,openai_domain,🤖 ChatGPT
-  - RULE-SET,github_domain,👨🏿‍💻 GitHub
+  - RULE-SET,github_domain,🚀 节点选择
   - RULE-SET,youtube_domain,📹 YouTube
-  - RULE-SET,google_domain,🍀 Google
-  - RULE-SET,onedrive_domain,🐬 OneDrive
-  - RULE-SET,microsoft_domain,🪟 Microsoft
+  - RULE-SET,facebook_domain,🐬 外贸
+  - RULE-SET,whatsapp_domain,🐬 外贸
+  - RULE-SET,instagram_domain,🐬 外贸 
+  - RULE-SET,linkedin_domain,🐬 外贸
+  - RULE-SET,x_domain,🐬 外贸
+  - RULE-SET,google_domain,🍀 Google 
+  - RULE-SET,onedrive_domain,🚀 节点选择
+  - RULE-SET,microsoft_domain,🚀 节点选择
   - RULE-SET,tiktok_domain,🎵 TikTok
   - RULE-SET,speedtest_domain,✈️ Speedtest
   - RULE-SET,telegram_domain,📲 Telegram
@@ -171,6 +184,7 @@ rules:
   - RULE-SET,geolocation-!cn,🚀 节点选择
   - RULE-SET,cn_domain,🎯 全球直连
   - RULE-SET,google_ip,🍀 Google,no-resolve
+  - RULE-SET,facebook_ip,🐬 外贸,no-resolve
   - RULE-SET,netflix_ip,🎥 NETFLIX,no-resolve
   - RULE-SET,telegram_ip,📲 Telegram,no-resolve
   - RULE-SET,cn_ip,🎯 全球直连
@@ -200,8 +214,16 @@ rule-providers:
   gfw_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/gfw.mrs"}
   geolocation-!cn: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"}
   cn_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"}
-  
+  facebook_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/facebook.mrs"}
+  whatsapp_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/whatsapp.mrs"}
+  instagram_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/instagram.mrs"}
+  linkedin_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/linkedin.mrs"}
+  x_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.mrs"}
+
+
   cn_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
   google_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs"}
   telegram_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs"}
   netflix_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs"}
+  facebook_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/facebook.mrs"}
+
