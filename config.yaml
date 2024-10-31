@@ -7,8 +7,8 @@ proxy-providers:
       enable: true
       url: https://www.gstatic.com/generate_204
       interval: 300
-    proxy: 直连
-    url: "机场订阅"
+    proxy: DIRECT
+    url: "https://rewnat.xyz/?L1N1YnNjcmlwdGlvbi9DbGFzaD9zaWQ9NTkyMzMmdG9rZW49RzJRdVN4QXd6RnImbW09NjkzMTkmNDZhMDQxOTUwYTg0NDFhNWExZA=="
       
 # 用于下载订阅时指定UA
 global-ua: clash
@@ -35,7 +35,7 @@ geox-url:
   asn: "https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb"
   
 # 控制面板
-external-controller: 0.0.0.0:9090
+external-controller: 127.0.0.1:9090
 secret: ""
 external-ui: ui
 external-ui-url: "https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
@@ -123,22 +123,21 @@ proxies:
   udp: true
  
 # 锚点
-pr: &pr {type: select, proxies: [🚀 节点选择, ⭐ 故转,🌐 均衡,🇺🇲 美国均衡,🇸🇬 加坡故转,🇯🇵 日本故转,🇺🇲 美国故转,🇯🇵 日本节点,🇺🇲 美国节点,🇸🇬 加坡自动,🇭🇰 香港自动,🇺🇲 美国自动,♻️ 自动选择,DIRECT]}
+pr: &pr {type: select, proxies: [🚀 节点选择,⭐ 故转,🌐 均衡,🇺🇲 美国均衡,🇸🇬 加坡故转,🇯🇵 日本故转,🇺🇲 美国故转,🇯🇵 日本自动,🇸🇬 加坡自动,🇭🇰 香港自动,🇺🇲 美国自动,♻️ 自动选择,DIRECT]}
 us: &us {type: select, proxies: [🇺🇲 美国故转,🇺🇲 美国均衡,🇺🇲 美国自动,♻️ 自动选择, DIRECT]}
 # 策略组
 proxy-groups:
-  - {name: 🚀 节点选择, type: select, proxies: [⭐ 故转,🌐 均衡,🇺🇲 美国均衡,🇸🇬 加坡故转,🇯🇵 日本故转,🇺🇲 美国故转,🇯🇵 日本节点,🇺🇲 美国节点,🇸🇬 加坡自动,🇭🇰 香港自动,🇺🇲 美国自动,♻️ 自动选择,DIRECT]}
+  - {name: 🚀 节点选择, type: select, proxies: [⭐ 故转,🌐 均衡,🇺🇲 美国均衡,🇸🇬 加坡故转,🇯🇵 日本故转,🇺🇲 美国故转,🇯🇵 日本自动,🇸🇬 加坡自动,🇭🇰 香港自动,🇺🇲 美国自动,♻️ 自动选择,DIRECT]}
   - {name: 📹 YouTube,!!merge <<: *pr}
   - {name: 🍀 Google,!!merge <<: *pr}
   - {name: 🤖 ChatGPT,!!merge <<: *us}
-  - {name: 👨🏿‍💻 GitHub,!!merge <<: *pr}
   - {name: 🐬 外贸,!!merge <<: *pr}
-  - {name: 🪟 Microsoft,!!merge <<: *pr}
   - {name: 🎵 TikTok,!!merge <<: *pr}
   - {name: 📲 Telegram,!!merge <<: *pr}
   - {name: 🎥 NETFLIX,!!merge <<: *pr}
   - {name: ✈️ Speedtest,!!merge <<: *pr}
   - {name: 💶 PayPal,!!merge <<: *pr}
+  - {name: ☁️ cloudflare,!!merge <<: *pr}
   - {name: 🍎 Apple, type: select, proxies: [DIRECT, 🚀 节点选择]}
   - {name: 🎯 全球直连, type: select, proxies: [DIRECT, 🚀 节点选择]}
   - {name: 🐟 漏网之鱼,!!merge <<: *pr}
@@ -150,9 +149,9 @@ proxy-groups:
   - {name: ⭐ 故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$" }
   
   - {name: 🌐 均衡, type: load-balance, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$" }
-  - {name: 🇺🇲 美国均衡, type: load-balance, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|us|unitedstates|united states|United States))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
+  - {name: 🇺🇲 美国均衡, type: load-balance, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|us|US|(?i)States|America))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
 
-  - {name: 🇯🇵 日本自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(日|东京|大阪|埼玉|JP|NRT|KIX|FUK|(?i)Japan)))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$" }
+  - {name: 🇯🇵 日本自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(日|东京|大阪|埼玉|JP|NRT|KIX|FUK|(?i)Japan))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
   - {name: 🇸🇬 加坡自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(新加坡|坡|狮城|SG|sg|SIN|Singapore))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
   - {name: 🇭🇰 香港自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(香港|HK|Hong Kong|🇭🇰|HongKong|HKG))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
   - {name: 🇺🇲 美国自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|us|US|(?i)States|America))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
@@ -176,6 +175,7 @@ rules:
   - RULE-SET,google_domain,🍀 Google 
   - RULE-SET,onedrive_domain,🚀 节点选择
   - RULE-SET,microsoft_domain,🚀 节点选择
+  - RULE-SET,cloudflare,☁️ cloudflare
   - RULE-SET,tiktok_domain,🎵 TikTok
   - RULE-SET,speedtest_domain,✈️ Speedtest
   - RULE-SET,telegram_domain,📲 Telegram
@@ -187,12 +187,12 @@ rules:
   - RULE-SET,facebook_ip,🐬 外贸,no-resolve
   - RULE-SET,netflix_ip,🎥 NETFLIX,no-resolve
   - RULE-SET,telegram_ip,📲 Telegram,no-resolve
+  - RULE-SET,cloudflare_ip,☁️ cloudflare,no-resolve
   - RULE-SET,cn_ip,🎯 全球直连
   - MATCH,🐟 漏网之鱼
 rule-anchor:
   ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
   domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
-  qcy: &qcy {type: http, interval: 86400, behavior: domain, format: text}
   class: &class {type: http, interval: 86400, behavior: classical, format: text}
 rule-providers: 
   private_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"}
@@ -219,6 +219,7 @@ rule-providers:
   instagram_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/instagram.mrs"}
   linkedin_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/linkedin.mrs"}
   x_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.mrs"}
+  cloudflare_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cloudflare.mrs"}
 
 
   cn_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
@@ -226,4 +227,4 @@ rule-providers:
   telegram_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs"}
   netflix_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs"}
   facebook_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/facebook.mrs"}
-
+  cloudflare_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cloudflare.mrs"}
