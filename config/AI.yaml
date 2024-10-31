@@ -30,6 +30,9 @@ payload:
   - DOMAIN-SUFFIX,deepmind.google
   - DOMAIN-SUFFIX,generativeai.google
   - DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com
+  - DOMAIN-SUFFIX,cursor.sh
+  - DOMAIN-SUFFIX,cursor.so
+  - DOMAIN-SUFFIX,cursor.com
 
   # 域名匹配
   - DOMAIN,cdn.usefathom.com
