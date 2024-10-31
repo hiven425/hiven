@@ -140,7 +140,7 @@ proxy-groups:
   - {name: ☁️ cloudflare,!!merge <<: *pr}
   - {name: 🍎 Apple, type: select, proxies: [DIRECT, 🚀 节点选择]}
   - {name: 🎯 全球直连, type: select, proxies: [DIRECT, 🚀 节点选择]}
-  - {name: 🐟 漏网之鱼,!!merge <<: *pr}
+  - {name: 🐟 漏网之鱼, type: select, proxies: [DIRECT, 🚀 节点选择]}
 
   # 节点筛选
   - {name: 🇸🇬 加坡故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(新加坡|坡|狮城|SG|sg|SIN|Singapore))^((?!(家宽|游戏|剩余|国内|海外|官网)).)*$"}
