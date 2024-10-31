@@ -1,0 +1,133 @@
+dns:
+  enable: true
+  listen: 127.0.0.1:1053
+  ipv6: true  # 启用IPv6以支持更多国际服务
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter-mode: blacklist
+  
+  # DNS基础服务器
+  default-nameserver:
+    - 8.8.8.8:53      # Google DNS
+    - 1.1.1.1:53      # Cloudflare DNS
+    - 119.29.29.29:53 # 腾讯DNS (备用)
+    
+  # 优化DNS服务器顺序，国际优先
+  nameserver:
+    # 国际加密DNS优先
+    - https://dns.cloudflare.com/dns-query#h3=true
+    - https://dns.google/dns-query#h3=true
+    # 国内备用
+    - https://dns.alidns.com/dns-query#h3=true
+    
+  # 可信的备用DNS
+  fallback:
+    - https://security.cloudflare-dns.com/dns-query#h3=true
+    - tls://1.1.1.1:853
+    - tls://8.8.8.8:853
+  
+  fake-ip-filter:
+    # 系统服务
+    - "*.local"
+    - "*.localhost"
+    - "*.test"
+    - "*.lan"
+    
+    # 外贸平台（需要真实IP）
+    - "*.alibaba.com"
+    - "*.aliexpress.com"
+    - "*.made-in-china.com"
+    - "*.globalsources.com"
+    - "*.dhgate.com"
+    - "*.canton-fair.com"
+    
+    # 社交媒体和通讯
+    - "*.linkedin.com"
+    - "*.facebook.com"
+    - "*.twitter.com"
+    - "*.instagram.com"
+    - "*.whatsapp.com"
+    - "*.telegram.org"
+    - "*.skype.com"
+    - "*.zoom.us"
+    
+    # 视频平台
+    - "*.youtube.com"
+    - "*.googlevideo.com"
+    - "*.ytimg.com"
+    - "*.ggpht.com"
+    
+    # 国内必需服务
+    - "+.qq.com"
+    - "+.weixin.qq.com"
+    - "+.alipay.com"
+    
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    domain:
+      # 外贸平台
+      - '+.alibaba.com'
+      - '+.aliexpress.com'
+      - '+.made-in-china.com'
+      - '+.globalsources.com'
+      
+      # 社交媒体
+      - '+.linkedin.com'
+      - '+.facebook.com'
+      - '+.twitter.com'
+      - '+.instagram.com'
+      
+      # Google服务
+      - '+.google.com'
+      - '+.youtube.com'
+      - '+.googleapis.com'
+      - '+.gstatic.com'
+      - '+.googlevideo.com'
+      
+      # 其他国际服务
+      - '+.cloudflare.com'
+      - '+.zoom.us'
+      - 'geosite:geolocation-!cn'
+    
+    ipcidr:
+      - 0.0.0.0/8
+      - 10.0.0.0/8
+      - 100.64.0.0/10
+      - 127.0.0.0/8
+      - 169.254.0.0/16
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - 224.0.0.0/4
+      - 240.0.0.0/4
+
+  # DNS策略优化
+  nameserver-policy:
+    # 外贸平台
+    'DOMAIN-SUFFIX,alibaba.com,DOMAIN-SUFFIX,aliexpress.com,DOMAIN-SUFFIX,made-in-china.com':
+      - https://dns.cloudflare.com/dns-query#h3=true
+      - https://dns.google/dns-query#h3=true
+    
+    # YouTube和Google服务
+    'DOMAIN-SUFFIX,youtube.com,DOMAIN-SUFFIX,google.com,DOMAIN-SUFFIX,googlevideo.com':
+      - https://dns.google/dns-query#h3=true
+      - tls://8.8.8.8:853
+    
+    # 社交媒体
+    'DOMAIN-SUFFIX,facebook.com,DOMAIN-SUFFIX,instagram.com,DOMAIN-SUFFIX,linkedin.com':
+      - https://security.cloudflare-dns.com/dns-query#h3=true
+      - tls://1.1.1.1:853
+    
+    # 国内必需服务
+    'DOMAIN-SUFFIX,qq.com,DOMAIN-SUFFIX,weixin.qq.com':
+      - https://doh.pub/dns-query#h3=true
+      - 119.29.29.29
+
+  # 性能优化
+  timeout: 3
+  concurrent: true
+  cache-size: 8000
+  independent-cache: true
+  prefetch-domain: true
+  enable-private-ip: true
+  prefer-h3: true
