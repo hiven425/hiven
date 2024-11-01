@@ -50,6 +50,7 @@ dns:
     - "*.telegram.org"
     - "*.skype.com"
     - "*.zoom.us"
+    - "*.x.com"
     
     # 视频平台
     - "*.youtube.com"
@@ -77,7 +78,8 @@ dns:
       - '+.facebook.com'
       - '+.twitter.com'
       - '+.instagram.com'
-      
+       - '+.x.com'
+       
       # Google服务
       - '+.google.com'
       - '+.youtube.com'
