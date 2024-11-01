@@ -21,3 +21,7 @@ DOMAIN-SUFFIX,guagua.info
 DOMAIN-SUFFIX,gcore.com
 DOMAIN-SUFFIX,huaweicloud.com
 DOMAIN-SUFFIX,qichiyu.com
+#mail
+DOMAIN-SUFFIX,gmail.com
+DOMAIN-SUFFIX,outlook.com
+DOMAIN-SUFFIX,office365.com
