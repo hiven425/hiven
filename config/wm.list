@@ -7,12 +7,12 @@ DOMAIN-SUFFIX,thomasnet.com
 DOMAIN-SUFFIX,ec21.com
 DOMAIN-SUFFIX,tradekey.com
 DOMAIN-SUFFIX,dhgate.com
-DOMAIN-SUFFIX,cantonfair.org.cn
 DOMAIN-SUFFIX,hktdc.com
 DOMAIN-SUFFIX,trade-india.com
 DOMAIN-SUFFIX,indiamart.com
 DOMAIN-SUFFIX,eworldtrade.com
 DOMAIN-SUFFIX,exportersindia.com
+DOMAIN-SUFFIX,taiwantrade.com.tw
 
 # 跨境支付
 DOMAIN-SUFFIX,paypal.com
@@ -22,13 +22,14 @@ DOMAIN-SUFFIX,wise.com
 DOMAIN-SUFFIX,worldfirst.com
 DOMAIN-SUFFIX,xoom.com
 DOMAIN-SUFFIX,westernunion.com
+DOMAIN-SUFFIX,payoneer.com
+DOMAIN-SUFFIX,pingpongx.com
 
 # 商务社交平台
 DOMAIN-SUFFIX,linkedin.com
 DOMAIN-SUFFIX,licdn.com
 DOMAIN-SUFFIX,xing.com
 DOMAIN-SUFFIX,viadeo.com
-DOMAIN-SUFFIX,companieshouse.gov.uk
 DOMAIN-SUFFIX,zoominfo.com
 DOMAIN-SUFFIX,dnb.com
 
@@ -37,21 +38,19 @@ DOMAIN-SUFFIX,skype.com
 DOMAIN-SUFFIX,zoom.us
 DOMAIN-SUFFIX,teams.microsoft.com
 DOMAIN-SUFFIX,webex.com
-DOMAIN-SUFFIX,whatsapp.com
-DOMAIN-SUFFIX,whatsapp.net
 DOMAIN-SUFFIX,telegram.org
 DOMAIN-SUFFIX,slack.com
 DOMAIN-SUFFIX,discord.com
+DOMAIN-SUFFIX,line.me
+DOMAIN-SUFFIX,signal.org
 
 # 邮件服务
 DOMAIN-SUFFIX,gmail.com
 DOMAIN-SUFFIX,mail.yahoo.com
 DOMAIN-SUFFIX,outlook.com
-DOMAIN-SUFFIX,office365.com
-DOMAIN-SUFFIX,mail.google.com
-DOMAIN-SUFFIX,googlemail.com
 DOMAIN-SUFFIX,protonmail.com
 DOMAIN-SUFFIX,zoho.com
+DOMAIN-SUFFIX,yandex.com
 
 # 外贸工具网站
 DOMAIN-SUFFIX,similarweb.com
@@ -63,6 +62,7 @@ DOMAIN-SUFFIX,importgenius.com
 DOMAIN-SUFFIX,panjiva.com
 DOMAIN-SUFFIX,trademap.org
 DOMAIN-SUFFIX,kompass.com
+DOMAIN-SUFFIX,findcompanyinfo.com
 
 # 国际物流快递
 DOMAIN-SUFFIX,dhl.com
@@ -73,6 +73,7 @@ DOMAIN-SUFFIX,maersk.com
 DOMAIN-SUFFIX,cma-cgm.com
 DOMAIN-SUFFIX,msc.com
 DOMAIN-SUFFIX,hapag-lloyd.com
+DOMAIN-SUFFIX,sf-express.com
 
 # 外贸资讯网站
 DOMAIN-SUFFIX,bloomberg.com
@@ -85,20 +86,25 @@ DOMAIN-SUFFIX,marketwatch.com
 DOMAIN-SUFFIX,trade.gov
 DOMAIN-SUFFIX,wto.org
 
-# 社交媒体（外贸营销用）
+# 社交媒体
 DOMAIN-SUFFIX,facebook.com
-DOMAIN-SUFFIX,fb.com
 DOMAIN-SUFFIX,instagram.com
 DOMAIN-SUFFIX,twitter.com
 DOMAIN-SUFFIX,pinterest.com
 DOMAIN-SUFFIX,youtube.com
 DOMAIN-SUFFIX,vimeo.com
+DOMAIN-SUFFIX,reddit.com
+DOMAIN-SUFFIX,quora.com
 
 # 云存储和协作
 DOMAIN-SUFFIX,dropbox.com
 DOMAIN-SUFFIX,box.com
 DOMAIN-SUFFIX,wetransfer.com
-DOMAIN-SUFFIX,google.com
 DOMAIN-SUFFIX,docs.google.com
 DOMAIN-SUFFIX,drive.google.com
 DOMAIN-SUFFIX,onedrive.live.com
+DOMAIN-SUFFIX,icloud.com
+
+# 额外优化
+DOMAIN-SUFFIX,spotify.com
+DOMAIN-SUFFIX,twitch.tv
