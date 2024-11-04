@@ -1,16 +1,28 @@
-# NAME: talkatone规则-DIRECT
-DOMAIN-SUFFIX,mobilefuse.com
-DOMAIN-SUFFIX,inmobi.com
-DOMAIN-SUFFIX,crashlytics.com
+# NAME: Talkatone
+# AUTHOR: Claude
+# UPDATED: 2024-11-04
+# DESCRIPTION: Optimized rules for Talkatone VoIP service
+
+# Core Talkatone Services
 DOMAIN-SUFFIX,talkatone.com
-DOMAIN-SUFFIX,kochava.com
-DOMAIN-SUFFIX,cohere.com
-DOMAIN-SUFFIX,ip-api.com
-DOMAIN-SUFFIX,agkn.com
 DOMAIN-SUFFIX,tktn.at
+DOMAIN-SUFFIX,tktn.be
+
+# Voice and Messaging Infrastructure
 IP-CIDR,50.117.27.0/24
 IP-CIDR,69.46.75.0/24
 IP-CIDR,205.164.56.0/24
 IP-CIDR,63.251.124.0/24
-# 下面这个tktn.be，需要走代理！！！自行设置
-# host-suffix, tktn.be, TW
+
+# Analytics and Crash Reporting
+DOMAIN-SUFFIX,crashlytics.com
+DOMAIN-SUFFIX,kochava.com
+
+# Advertising Services (Optional - can be blocked if ads are not a concern)
+DOMAIN-SUFFIX,mobilefuse.com
+DOMAIN-SUFFIX,inmobi.com
+DOMAIN-SUFFIX,agkn.com
+
+# API Services
+DOMAIN-SUFFIX,ip-api.com
+DOMAIN-SUFFIX,cohere.com
