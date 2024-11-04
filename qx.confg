@@ -81,10 +81,10 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Quant
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Claude/Claude.list, tag=Claude, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
 
 #自己
-https://raw.githubusercontent.com/hiven425/hiven/master/config/AI.list, tag=OpenAi, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/hiven425/hiven/master/config/ProxyLite.list, tag=全球加速, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/hiven425/hiven/master/config/Direct.list, tag=国内网站, force-policy=direct, update-interval=172800, opt-parser=true, enabled=true
-https://raw.githubusercontent.com/hiven425/hiven/master/config/config/Talkatone.list, tag=全球加速, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=true
+https://raw.githubusercontent.com/hiven425/hiven/master/config/AI.list, tag=MyAi, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
+https://raw.githubusercontent.com/hiven425/hiven/master/config/ProxyLite.list, tag=MyProxy, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=true
+https://raw.githubusercontent.com/hiven425/hiven/master/config/Direct.list, tag=MyDirect, force-policy=direct, update-interval=172800, opt-parser=true, enabled=true
+https://raw.githubusercontent.com/hiven425/hiven/master/config/config/Talkatone.list, tag=Talkatone, force-policy=全球加速, update-interval=172800, opt-parser=true, enabled=true
 #Google、Microsoft
 https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/QuantumultX/GoogleSearch/GoogleSearch.list, tag=Google, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Google/Google.list, tag=Google, force-policy=美国节点, update-interval=172800, opt-parser=true, enabled=true
