@@ -8,7 +8,7 @@ proxy-providers:
       url: https://www.gstatic.com/generate_204
       interval: 300
     proxy: DIRECT
-    url: "https://rewnat.xyz/?L1N1YnNjcmlwdGlvbi9DbGFzaD9zaWQ9NTkyMzMmdG9rZW49RzJRdVN4QXd6RnImbW09NjkzMTkmNDZhMDQxOTUwYTg0NDFhNWExZA=="
+    url: ""
       
 # 用于下载订阅时指定UA
 global-ua: clash
