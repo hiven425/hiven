@@ -48,7 +48,7 @@ https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/XiaoHongShu.
 https://raw.githubusercontent.com/chavyleung/scripts/master/box/rewrite/boxjs.rewrite.quanx.conf, tag=BoxJS商店版@chavyleung, update-interval=86400, opt-parser=false, enabled=false
 https://raw.githubusercontent.com/app2smile/rules/master/js/spotify-lyric.js, tag=Spotify歌词翻译@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
 https://gist.githubusercontent.com/ddgksf2013/f4752e632fd3375ea2811985c5b635dc/raw/alicloud.js, tag=阿里云盘倍速@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
-https://gist.githubusercontent.com/ddgksf2013/f4752e632fd3375ea2811985c5b635dc/raw/alicloud.js, tag=IOS解锁天气服务@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
+https://github.com/NSRingo/WeatherKit/releases/latest/download/WeatherKit.snippet, tag=IOS解锁天气服务@ddgksf2013, update-interval=86400, opt-parser=false, enabled=false
 
 [policy]
 static=OpenAI, 美国节点, 自动选择,手动选择, proxy, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/OpenAI.png
