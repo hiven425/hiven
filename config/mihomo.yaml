@@ -54,7 +54,7 @@ geox-url:
   
 # 控制面板
 external-controller: 127.0.0.1:9090
-secret: "Mihomo@0925A"
+secret: ""
 external-ui: ui
 external-ui-url: "https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
 
