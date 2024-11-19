@@ -1,6 +1,3 @@
-# NAME: talkatoneAdBlock
-# DESCRIPTION: 去除 talkatone 中的广告
-# REJECT
 DOMAIN-SUFFIX,ads.inmobi.com
 DOMAIN-SUFFIX,tappx.com
 DOMAIN-SUFFIX,criteo.com
@@ -11,7 +8,6 @@ DOMAIN-KEYWORD,googleads
 DOMAIN-SUFFIX,adsappier.com
 DOMAIN-SUFFIX,appier.net
 DOMAIN-SUFFIX,appiersig.com
-
 DOMAIN-SUFFIX,ads.talkatone.com
 DOMAIN-SUFFIX,tracking.talkatone.com
 DOMAIN-SUFFIX,analytics.talkatone.com

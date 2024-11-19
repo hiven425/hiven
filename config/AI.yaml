@@ -2,8 +2,6 @@ payload:
   - DOMAIN-KEYWORD,openai
   - DOMAIN-KEYWORD,anthropic
   - DOMAIN-KEYWORD,Claude
-
-  # 域名后缀匹配
   - DOMAIN-SUFFIX,perplexity.ai
   - DOMAIN-SUFFIX,chatgpt.com
   - DOMAIN-SUFFIX,auth0.com
@@ -33,8 +31,6 @@ payload:
   - DOMAIN-SUFFIX,cursor.sh
   - DOMAIN-SUFFIX,cursor.so
   - DOMAIN-SUFFIX,cursor.com
-
-  # 域名匹配
   - DOMAIN,cdn.usefathom.com
   - DOMAIN,ai.google.dev
   - DOMAIN,alkalimakersuite-pa.clients6.google.com
