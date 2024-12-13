@@ -221,6 +221,7 @@ rule-anchor:
   domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
   class: &class {type: http, interval: 86400, behavior: classical, format: text}
 rule-providers: 
+  youtube_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs"}
   private_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"}
   my_proxylite: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/ProxyLite.list"}
   my_ai: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/AI.list"}
