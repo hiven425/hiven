@@ -1,0 +1,14 @@
+DOMAIN-SUFFIX,immersive-translate.owenyoung.com,REJECT
+DOMAIN-SUFFIX,immersivetranslate.com,REJECT
+DOMAIN-SUFFIX,test-api2.immersivetranslate.com,REJECT
+DOMAIN-SUFFIX,api2.immersivetranslate.com,REJECT
+DOMAIN-SUFFIX,config.immersivetranslate.com,REJECT
+DOMAIN-SUFFIX,app.immersivetranslate.com,REJECT
+DOMAIN-SUFFIX,dash.immersivetranslate.com,REJECT
+DOMAIN-SUFFIX,api.immersivetranslate.com,REJECT
+DOMAIN-SUFFIX,immersive-translate.deno.dev,REJECT
+DOMAIN-SUFFIX,ai.immersivetranslate.com,REJECT
+DOMAIN-SUFFIX,test-ai.immersivetranslate.com,REJECT
+
+DOMAIN-KEYWORD,immersivetranslate,REJECT
+DOMAIN-KEYWORD,immersive-translate,REJECT
