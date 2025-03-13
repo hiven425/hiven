@@ -27,3 +27,4 @@ payload:
   - DOMAIN-SUFFIX,missav.ai
   - DOMAIN-SUFFIX,pages.dev
   - DOMAIN-SUFFIX,huggingface.co
+  - DOMAIN-SUFFIX,hf.space
