@@ -37,6 +37,9 @@ DOMAIN-SUFFIX,cursor.so
 DOMAIN-SUFFIX,cursor.ai
 DOMAIN-SUFFIX,getcursor.com
 DOMAIN-SUFFIX,cursor.com
+DOMAIN-SUFFIX,cursor-cdn.com
+DOMAIN-SUFFIX,cursorapi.com
+DOMAIN-SUFFIX,workos.com
 DOMAIN-SUFFIX,x.ai
 DOMAIN-SUFFIX,gstatic.com
 DOMAIN-SUFFIX,googleapis.com
