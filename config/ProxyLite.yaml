@@ -28,3 +28,5 @@ payload:
   - DOMAIN-SUFFIX,pages.dev
   - DOMAIN-SUFFIX,huggingface.co
   - DOMAIN-SUFFIX,hf.space
+  - DOMAIN-SUFFIX,faviconkit.com
+  - DOMAIN-SUFFIX,posthog.com
