@@ -1,21 +1,2 @@
-ip-cidr, 100.64.0.0/10, Tailscale
-ip-cidr, 10.0.0.1/32, Tailscale
-ip-cidr, 10.0.0.2/32, Tailscale
-ip-cidr, 10.0.0.3/32, Tailscale
-ip-cidr, 10.0.0.4/32, Tailscale
-ip-cidr, 10.0.0.5/32, Tailscale
-ip-cidr, 10.0.0.6/32, Tailscale
-ip-cidr, 10.0.0.7/32, Tailscale
-ip-cidr, 10.0.0.8/32, Tailscale
-ip-cidr, 10.0.0.9/32, Tailscale
-ip-cidr, 10.0.0.10/32, Tailscale
-ip-cidr, 10.0.0.11/32, Tailscale
-ip-cidr, 10.0.0.12/32, Tailscale
-ip-cidr, 10.0.0.13/32, Tailscale
-ip-cidr, 10.0.0.14/32, Tailscale
-ip-cidr, 10.0.0.15/32, Tailscale
-ip-cidr, 10.0.0.16/32, Tailscale
-ip-cidr, 10.0.0.17/32, Tailscale
-ip-cidr, 10.0.0.18/32, Tailscale
-ip-cidr, 10.0.0.19/32, Tailscale
-ip-cidr, 10.0.0.20/32, Tailscale
+IP-CIDR,100.64.0.0/10
+IP-CIDR,10.0.0.6/32
