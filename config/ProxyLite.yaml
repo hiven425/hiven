@@ -32,3 +32,4 @@ payload:
   - DOMAIN-SUFFIX,posthog.com
   - DOMAIN-SUFFIX,smithery.ai
   - DOMAIN-SUFFIX,npmjs.org
+  - DOMAIN-SUFFIX,synology.com
