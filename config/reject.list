@@ -11,3 +11,5 @@ DOMAIN-SUFFIX,appiersig.com
 DOMAIN-SUFFIX,ads.talkatone.com
 DOMAIN-SUFFIX,tracking.talkatone.com
 DOMAIN-SUFFIX,analytics.talkatone.com
+DOMAIN-SUFFIX,ads.twitter.com,REJECT
+DOMAIN-SUFFIX,analytics.twitter.com,REJECT
