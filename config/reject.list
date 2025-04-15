@@ -13,3 +13,4 @@ DOMAIN-SUFFIX,tracking.talkatone.com
 DOMAIN-SUFFIX,analytics.talkatone.com
 DOMAIN-SUFFIX,ads.twitter.com,REJECT
 DOMAIN-SUFFIX,analytics.twitter.com,REJECT
+DOMAIN-SUFFIX,ads-api.twitter.com,REJECT
