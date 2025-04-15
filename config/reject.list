@@ -15,3 +15,6 @@ DOMAIN-SUFFIX,ads.twitter.com
 DOMAIN-SUFFIX,analytics.twitter.com
 DOMAIN-SUFFIX,ads-api.twitter.com
 DOMAIN-SUFFIX,p.twitter.com
+DOMAIN-SUFFIX,googlesyndication.com
+DOMAIN-SUFFIX,googleadservices.com
+DOMAIN-SUFFIX,doubleclick.net
