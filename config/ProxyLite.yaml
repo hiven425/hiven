@@ -26,3 +26,10 @@ payload:
   - DOMAIN-SUFFIX,duyaoss.com
   - DOMAIN-SUFFIX,missav.ai
   - DOMAIN-SUFFIX,pages.dev
+  - DOMAIN-SUFFIX,huggingface.co
+  - DOMAIN-SUFFIX,hf.space
+  - DOMAIN-SUFFIX,faviconkit.com
+  - DOMAIN-SUFFIX,posthog.com
+  - DOMAIN-SUFFIX,smithery.ai
+  - DOMAIN-SUFFIX,npmjs.org
+  - DOMAIN-SUFFIX,synology.com
