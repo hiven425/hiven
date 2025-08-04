@@ -48,6 +48,7 @@ payload:
   - DOMAIN-SUFFIX,ai.google.com
   - DOMAIN-SUFFIX,aistudio.google.com
   - DOMAIN-SUFFIX,research.google.com
+  - DOMAIN-SUFFIX,augmentcode.com
   - DOMAIN,cdn.usefathom.com
   - DOMAIN,ai.google.dev
   - DOMAIN,alkalimakersuite-pa.clients6.google.com
