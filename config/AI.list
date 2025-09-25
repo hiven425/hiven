@@ -51,6 +51,7 @@ DOMAIN-SUFFIX,aistudio.google.com
 DOMAIN-SUFFIX,research.google.com
 DOMAIN-SUFFIX,trae.ai
 DOMAIN-SUFFIX,augmentcode.com
+DOMAIN-SUFFIX,marscode.com
 #DOMAIN
 DOMAIN,cdn.usefathom.com
 DOMAIN,ai.google.dev
