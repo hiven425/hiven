@@ -1,0 +1,347 @@
+port: 7890
+socks-port: 7891
+redir-port: 7892
+mixed-port: 7893
+tproxy-port: 7894
+ipv6: false
+allow-lan: true
+unified-delay: true
+tcp-concurrent: true
+geodata-mode: true
+bind-address: '*'
+
+external-controller: "127.0.0.1:9090"
+secret: "Codex@2025!mihomo"
+external-ui: "/etc/nikki/run/ui"
+external-ui-name: zashboard
+external-ui-url: "https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip"
+
+find-process-mode: strict
+global-client-fingerprint: chrome
+keep-alive-idle: 600
+keep-alive-interval: 30
+
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+sniffer:
+  enable: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+      override-destination: true
+    QUIC:
+      ports: [443, 8443]
+  force-domain:
+    - +.v2ex.com
+  skip-domain:
+    - dlg.io.mi.com
+    - +.push.apple.com
+    - +.apple.com
+    - +.lan
+    - +.local
+
+tun:
+  enable: true
+  # system/gvisor/mixed
+  stack: mixed
+  dns-hijack: ["any:53", "tcp://any:53"]
+  #使用nikki，混入全部不修改的情况，开启接口指定为nikki
+  #使用仅内核自行修改下面三项为true
+  #device: nikki
+  auto-route: false
+  auto-redirect: false
+  auto-detect-interface: false
+
+
+
+# DNS模块
+dns:
+  enable: true
+  listen: 0.0.0.0:1053
+  ipv6: false
+  respect-rules: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 28.0.0.1/8
+  fake-ip-filter-mode: blacklist
+  proxy-server-nameserver:
+      - 119.29.29.29
+  direct-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  nameserver:
+    - https://8.8.8.8/dns-query
+  nameserver-policy:
+    "rule-set:private_domain,cn_domain,apple_domain":
+      - 223.5.5.5
+      - 119.29.29.29
+  fake-ip-filter:
+    - "rule-set:private_domain,cn_domain,apple_domain"
+
+templates:
+  - &url_test_template
+    type: url-test
+    include-all: true
+    tolerance: 30
+    interval: 600
+    url: http://www.gstatic.com/generate_204
+  - &GlobalProxies
+    type: select
+    proxies: [♻️ 自动选择, 🚀 节点选择, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🇭🇰 香港节点, 🏚️ 家宽节点, DIRECT]
+  - &USProxies
+    type: select
+    proxies: [🇺🇲 美国节点, ♻️ 自动选择, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🏚️ 家宽节点, DIRECT]
+  - &DirectFirst
+    type: select
+    proxies: [DIRECT, 🏚️ 家宽节点, 🚀 节点选择]
+  - &AIProxies
+    type: select
+    proxies: [🇺🇲 美国节点, 🏚️ 家宽节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, ♻️ 自动选择]
+
+proxy-groups:
+  - name: 🚀 节点选择
+    type: select
+    proxies: [♻️ 自动选择, 🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🏚️ 家宽节点, 🌍 其他节点, DIRECT]
+  - name: 📹 YouTube
+    <<: *GlobalProxies
+  - name: 🍀 Google
+    <<: *AIProxies
+  - name: 🍒 microsoft
+    <<: *GlobalProxies
+  - name: 🏹 ChatGPT
+    <<: *AIProxies
+  - name: 🐬 外贸
+    <<: *USProxies
+  - name: 🎵 TikTok
+    <<: *GlobalProxies
+  - name: 📲 Telegram
+    <<: *GlobalProxies
+  - name: 🎥 NETFLIX
+    <<: *GlobalProxies
+  - name: ✈️ Speedtest
+    <<: *GlobalProxies
+  - name: 💶 PayPal
+    <<: *GlobalProxies
+  - name: ☁️ cloudflare
+    <<: *GlobalProxies
+  - name: 🍎 Apple
+    <<: *DirectFirst
+  - name: 🎯 全球直连
+    <<: *DirectFirst
+  - name: 🐟 漏网之鱼
+    <<: *DirectFirst
+  - name: 🛑 广告拦截
+    type: select
+    proxies: [REJECT, DIRECT]
+  - name: 🇭🇰 香港节点
+    <<: *url_test_template
+    filter: '^(?=.*(?i)(?:香港|港|🇭🇰|HK|Hong Kong|HKG|沪港|深港|Kowloon|Victoria))(?!.*(?i)(?:美|🇺🇸|US|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品)).*$'
+  - name: 🇺🇲 美国节点
+    <<: *url_test_template
+    filter: '^(?=.*(?i)(?:美|🇺🇸|US|USA|States|American|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|New York|Miami|Boston|United States|San Francisco))(?!.*(?i)(?:港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|巴西|阿根廷|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品)).*$'
+  - name: 🇯🇵 日本节点
+    <<: *url_test_template
+    filter: '^(?=.*(?i)(?:日本|🇯🇵|JP|NRT|KIX|FUK|Japan|川日|东京|大阪|泉日|埼玉|名古屋|Nagoya|Kyoto|Okinawa))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品)).*$'
+  - name: 🇹🇼 台湾节点
+    <<: *url_test_template
+    filter: '^(?=.*(?i)(?:台湾|台|🇹🇼|TW|TPE|KHH|Taiwan|新北|彰化|台北|Taipei|高雄|Kaohsiung|Taichung|台中))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品)).*$'
+  - name: 🇸🇬 新加坡节点
+    <<: *url_test_template
+    filter: '^(?=.*(?i)(?:新加坡|坡|狮城|🇸🇬|SG|SIN|Singapore|Changi|Marina Bay))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品)).*$'
+  - name: 🌍 其他节点
+    <<: *url_test_template
+    filter: '^(?!.*(?i)(?:美|🇺🇸|US|日本|🇯🇵|JP|台湾|🇹🇼|TW|新加坡|🇸🇬|SG|香港|🇭🇰|HK|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品)).*$'
+  - name: 🏚️ 家宽节点
+    type: select
+    include-all: true
+    filter: '^(?=.*(?i)(?:家宽))(?!.*(?i)(?:亚洲|试车|到期|过期|剩余|流量|时间|官网|产品)).*$'
+  - name: ♻️ 自动选择
+    type: url-test
+    proxies: [🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
+    tolerance: 30
+    interval: 600
+    url: http://www.gstatic.com/generate_204
+
+rules:
+  - RULE-SET,private_domain,DIRECT
+  - RULE-SET,my_direct,DIRECT
+  - RULE-SET,category-ads-all,🛑 广告拦截
+  - RULE-SET,apple_domain,🍎 Apple
+  - RULE-SET,my_proxylite,🚀 节点选择
+  - RULE-SET,my_ai,🏹 ChatGPT
+  - RULE-SET,my_wm,🐬 外贸
+  - RULE-SET,openai_domain,🏹 ChatGPT
+  - RULE-SET,ai_domain,🏹 ChatGPT
+  - RULE-SET,github_domain,🚀 节点选择
+  - RULE-SET,youtube_domain,📹 YouTube
+  - RULE-SET,facebook_domain,🐬 外贸
+  - RULE-SET,whatsapp_domain,🐬 外贸
+  - RULE-SET,instagram_domain,🐬 外贸
+  - RULE-SET,linkedin_domain,🐬 外贸
+  - RULE-SET,x_domain,🐬 外贸
+  - RULE-SET,google_domain,🍀 Google
+  - RULE-SET,google_gemini_domain,🍀 Google
+  - RULE-SET,onedrive_domain,🚀 节点选择
+  - RULE-SET,microsoft_domain,🍒 microsoft
+  - RULE-SET,cloudflare_domain,☁️ cloudflare
+  - RULE-SET,tiktok_domain,🎵 TikTok
+  - RULE-SET,speedtest_domain,✈️ Speedtest
+  - RULE-SET,telegram_domain,📲 Telegram
+  - RULE-SET,netflix_domain,🎥 NETFLIX
+  - RULE-SET,paypal_domain,💶 PayPal
+  - RULE-SET,geolocation-!cn,🚀 节点选择
+  - RULE-SET,cn_domain,🎯 全球直连
+  - RULE-SET,google_ip,🍀 Google,no-resolve
+  - RULE-SET,facebook_ip,🐬 外贸,no-resolve
+  - RULE-SET,netflix_ip,🎥 NETFLIX,no-resolve
+  - RULE-SET,telegram_ip,📲 Telegram,no-resolve
+  - RULE-SET,cloudflare_ip,☁️ cloudflare,no-resolve
+  - RULE-SET,cn_ip,🎯 全球直连
+  - MATCH,🐟 漏网之鱼
+
+rule-anchor:
+  ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
+  domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
+  class: &class {type: http, interval: 86400, behavior: classical, format: text}
+
+rule-providers:
+  category-ads-all:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs"
+    path: ./rule-cache/category-ads-all.mrs
+  youtube_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs"
+    path: ./rule-cache/youtube_domain.mrs
+  private_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"
+    path: ./rule-cache/private_domain.mrs
+  my_proxylite:
+    <<: *class
+    url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/ProxyLite.list"
+    path: ./rule-cache/my_proxylite.list
+  my_ai:
+    <<: *class
+    url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/AI.list"
+    path: ./rule-cache/my_ai.list
+  my_direct:
+    <<: *class
+    url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/Direct.list"
+    path: ./rule-cache/my_direct.list
+  my_wm:
+    <<: *class
+    url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/wm.list"
+    path: ./rule-cache/my_wm.list
+  ai_domain:
+    <<: *domain
+    url: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/ai.mrs"
+    path: ./rule-cache/ai_domain.mrs
+  openai_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.mrs"
+    path: ./rule-cache/openai_domain.mrs
+  google_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"
+    path: ./rule-cache/google_domain.mrs
+  google_gemini_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google-gemini.mrs"
+    path: ./rule-cache/google_gemini_domain.mrs
+  github_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs"
+    path: ./rule-cache/github_domain.mrs
+  telegram_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs"
+    path: ./rule-cache/telegram_domain.mrs
+  netflix_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs"
+    path: ./rule-cache/netflix_domain.mrs
+  paypal_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/paypal.mrs"
+    path: ./rule-cache/paypal_domain.mrs
+  onedrive_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/onedrive.mrs"
+    path: ./rule-cache/onedrive_domain.mrs
+  microsoft_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs"
+    path: ./rule-cache/microsoft_domain.mrs
+  apple_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple-cn.mrs"
+    path: ./rule-cache/apple_domain.mrs
+  speedtest_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/ookla-speedtest.mrs"
+    path: ./rule-cache/speedtest_domain.mrs
+  tiktok_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs"
+    path: ./rule-cache/tiktok_domain.mrs
+  geolocation-!cn:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"
+    path: ./rule-cache/geolocation-not-cn.mrs
+  cn_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"
+    path: ./rule-cache/cn_domain.mrs
+  facebook_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/facebook.mrs"
+    path: ./rule-cache/facebook_domain.mrs
+  whatsapp_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/whatsapp.mrs"
+    path: ./rule-cache/whatsapp_domain.mrs
+  instagram_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/instagram.mrs"
+    path: ./rule-cache/instagram_domain.mrs
+  linkedin_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/linkedin.mrs"
+    path: ./rule-cache/linkedin_domain.mrs
+  x_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.mrs"
+    path: ./rule-cache/x_domain.mrs
+  cloudflare_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cloudflare.mrs"
+    path: ./rule-cache/cloudflare_domain.mrs
+  cn_ip:
+    <<: *ip
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"
+    path: ./rule-cache/cn_ip.mrs
+  google_ip:
+    <<: *ip
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs"
+    path: ./rule-cache/google_ip.mrs
+  telegram_ip:
+    <<: *ip
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs"
+    path: ./rule-cache/telegram_ip.mrs
+  netflix_ip:
+    <<: *ip
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs"
+    path: ./rule-cache/netflix_ip.mrs
+  facebook_ip:
+    <<: *ip
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/facebook.mrs"
+    path: ./rule-cache/facebook_ip.mrs
+  cloudflare_ip:
+    <<: *ip
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cloudflare.mrs"
+    path: ./rule-cache/cloudflare_ip.mrs
