@@ -1,0 +1,281 @@
+# Shared Mihomo policy layer for office use.
+# This file intentionally omits environment-specific runtime settings such as:
+# ports, bind-address, allow-lan, controller/UI path, TUN wiring, and DNS listen.
+# Use it as the source of truth when syncing:
+# - clash/config_mihomo.yaml      (Nikki / OpenWrt full profile)
+# - clash/mihomo.sparkle.yaml     (Sparkle / Windows full profile)
+
+proxy-providers:
+  Airport_01:
+    type: http
+    interval: 1800
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 300
+    proxy: DIRECT
+    url: ""
+
+ipv6: false
+unified-delay: true
+tcp-concurrent: true
+
+# GeoData Settings
+geo-auto-update: true
+geo-update-interval: 48
+geox-url:
+  geoip: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
+  geosite: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
+  mmdb: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+  asn: "https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb"
+
+# Core Behavior
+find-process-mode: strict
+global-client-fingerprint: chrome
+keep-alive-idle: 600
+keep-alive-interval: 30
+
+# Profile Settings
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+# Traffic Sniffing
+sniffer:
+  enable: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+      override-destination: true
+    QUIC:
+      ports: [443, 8443]
+      override-destination: true
+  force-domain:
+    - '+.v2ex.com'
+  skip-domain:
+    - 'Mijia Cloud'
+    - 'dlg.io.mi.com'
+    - '+.push.apple.com'
+    - '+.apple.com'
+
+# DNS Configuration
+dns:
+  enable: true
+  ipv6: false
+  respect-rules: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 28.0.0.1/8
+  fake-ip-filter-mode: blacklist
+  fake-ip-filter:
+    - '+.lan'
+    - '+.local'
+    - geosite:private
+    - geosite:cn
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  proxy-server-nameserver:
+    - https://dns.google/dns-query
+    - https://dns.cloudflare.com/dns-query
+  nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  nameserver-policy:
+    'rule-set:private_domain,cn_domain':
+      - https://dns.alidns.com/dns-query
+      - https://doh.pub/dns-query
+    'geosite:geolocation-!cn':
+      - https://dns.cloudflare.com/dns-query
+      - https://dns.google/dns-query
+
+# ----------------- 锚点与模板 (Templates & Anchors) -----------------
+templates:
+  - &url_test_template
+    type: url-test
+    include-all: true
+    tolerance: 50
+    interval: 900
+
+  - &GlobalProxies
+    type: select
+    proxies: [♻️ 自动选择, 🚀 节点选择, DIRECT]
+  - &USProxies
+    type: select
+    proxies: [🏚️ 家宽节点, 🇺🇲 美国节点, ♻️ 自动选择, 🚀 节点选择]
+  - &DirectFirst
+    type: select
+    proxies: [DIRECT, 🚀 节点选择]
+  - &AIProxies
+    type: select
+    proxies: [🏚️ 家宽节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇸🇬 新加坡节点, 🇹🇼 台湾节点, ♻️ 自动选择]
+  - &OfficeProxies
+    type: select
+    proxies: [🏚️ 家宽节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇸🇬 新加坡节点, 🇹🇼 台湾节点, ♻️ 自动选择, 🚀 节点选择]
+  - &YouTubeProxies
+    type: select
+    proxies: [🏚️ 家宽节点, 🇺🇲 美国节点, 🇸🇬 新加坡节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, ♻️ 自动选择, 🚀 节点选择]
+  - &SpeedtestProxies
+    type: select
+    proxies: [DIRECT, ♻️ 自动选择, 🚀 节点选择]
+
+# ----------------- 策略组 (Proxy Groups) -----------------
+proxy-groups:
+  - name: 🚀 节点选择
+    type: select
+    proxies: [🏚️ 家宽节点, ♻️ 自动选择, 🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
+
+  - name: 📹 YouTube
+    <<: *YouTubeProxies
+  - name: 🍀 Google
+    <<: *AIProxies
+  - name: 🍒 microsoft
+    <<: *OfficeProxies
+  - name: 🏹 ChatGPT
+    <<: *AIProxies
+  - name: 💻 GitHub
+    <<: *OfficeProxies
+  - name: 🐬 外贸
+    <<: *USProxies
+  - name: 🎵 TikTok
+    <<: *GlobalProxies
+  - name: 📲 Telegram
+    <<: *GlobalProxies
+  - name: 🎥 NETFLIX
+    <<: *GlobalProxies
+  - name: ✈️ Speedtest
+    <<: *SpeedtestProxies
+  - name: 💶 PayPal
+    <<: *GlobalProxies
+  - name: ☁️ cloudflare
+    <<: *GlobalProxies
+  - name: 🍎 Apple
+    <<: *DirectFirst
+  - name: 🎯 全球直连
+    <<: *DirectFirst
+  - name: 🐟 漏网之鱼
+    <<: *DirectFirst
+  - name: 🛑 广告拦截
+    type: select
+    proxies: [REJECT]
+
+  - name: 🇭🇰 香港节点
+    <<: *url_test_template
+    filter: '^(?=.*(?i)(?:香港|港|🇭🇰|HK|Hong Kong|HKG|沪港|深港|Kowloon|Victoria))(?!.*(?i)(?:美|🇺🇸|US|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+
+  - name: 🇺🇲 美国节点
+    <<: *url_test_template
+    filter: '^(?=.*(?i)(?:美|🇺🇸|US|USA|States|American|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|New York|Miami|Boston|United States|San Francisco))(?!.*(?i)(?:港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+
+  - name: 🇯🇵 日本节点
+    <<: *url_test_template
+    filter: '^(?=.*(?i)(?:日本|🇯🇵|JP|NRT|KIX|FUK|Japan|川日|东京|大阪|泉日|埼玉|名古屋|Nagoya|Kyoto|Okinawa))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+
+  - name: 🇹🇼 台湾节点
+    <<: *url_test_template
+    filter: '^(?=.*(?i)(?:台湾|台|🇹🇼|TW|TPE|KHH|Taiwan|新北|彰化|台北|Taipei|高雄|Kaohsiung|Taichung|台中))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+
+  - name: 🇸🇬 新加坡节点
+    <<: *url_test_template
+    filter: '^(?=.*(?i)(?:新加坡|坡|狮城|🇸🇬|SG|SIN|Singapore|Changi|Marina Bay))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+
+  - name: 🌍 其他节点
+    <<: *url_test_template
+    filter: '^(?!.*(?i)(?:美|🇺🇸|US|日本|🇯🇵|JP|台湾|🇹🇼|TW|新加坡|🇸🇬|SG|香港|🇭🇰|HK|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+  - name: 🏚️ 家宽节点
+    <<: *url_test_template
+    filter: '^(?=.*(?i)(?:家宽))(?!.*(?i)(?:亚洲|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+
+  - name: ♻️ 自动选择
+    type: url-test
+    proxies: [🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
+    tolerance: 50
+    interval: 900
+
+# ----------------- 规则 (Rules) -----------------
+rules:
+  - PROCESS-NAME,Speedtest.exe,✈️ Speedtest
+  - DOMAIN-SUFFIX,linux.do,♻️ 自动选择
+  - RULE-SET,private_domain,DIRECT
+  - RULE-SET,my_direct,DIRECT
+  - RULE-SET,apple_domain,🍎 Apple
+  - RULE-SET,my_proxylite,🚀 节点选择
+  - RULE-SET,my_ai_exe,🏹 ChatGPT
+  - RULE-SET,my_ai,🏹 ChatGPT
+  - RULE-SET,my_wm,🐬 外贸
+  - RULE-SET,openai_domain,🏹 ChatGPT
+  - RULE-SET,ai_domain,🏹 ChatGPT
+  - RULE-SET,github_domain,💻 GitHub
+  - RULE-SET,youtube_domain,📹 YouTube
+  - RULE-SET,facebook_domain,🐬 外贸
+  - RULE-SET,whatsapp_domain,🐬 外贸
+  - RULE-SET,instagram_domain,🐬 外贸
+  - RULE-SET,linkedin_domain,🐬 外贸
+  - RULE-SET,x_domain,🐬 外贸
+  - RULE-SET,google_domain,🍀 Google
+  - RULE-SET,google_gemini_domain,🍀 Google
+  - RULE-SET,onedrive_domain,🚀 节点选择
+  - RULE-SET,microsoft_domain,🍒 microsoft
+  - RULE-SET,cloudflare_domain,☁️ cloudflare
+  - RULE-SET,tiktok_domain,🎵 TikTok
+  - RULE-SET,speedtest_domain,✈️ Speedtest
+  - RULE-SET,telegram_domain,📲 Telegram
+  - RULE-SET,netflix_domain,🎥 NETFLIX
+  - RULE-SET,paypal_domain,💶 PayPal
+  - IP-CIDR,8.8.8.8/32,🍀 Google,no-resolve
+  - IP-CIDR,8.8.4.4/32,🍀 Google,no-resolve
+  - IP-CIDR,1.1.1.1/32,☁️ cloudflare,no-resolve
+  - IP-CIDR,1.0.0.1/32,☁️ cloudflare,no-resolve
+  - RULE-SET,geolocation-!cn,🚀 节点选择
+  - RULE-SET,cn_domain,🎯 全球直连
+  - RULE-SET,google_ip,🍀 Google,no-resolve
+  - RULE-SET,facebook_ip,🐬 外贸,no-resolve
+  - RULE-SET,netflix_ip,🎥 NETFLIX,no-resolve
+  - RULE-SET,telegram_ip,📲 Telegram,no-resolve
+  - RULE-SET,cloudflare_ip,☁️ cloudflare,no-resolve
+  - RULE-SET,cn_ip,🎯 全球直连
+  - MATCH,🐟 漏网之鱼
+
+rule-anchor:
+  ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
+  domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
+  class: &class {type: http, interval: 86400, behavior: classical, format: text}
+
+rule-providers:
+  youtube_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs"}
+  private_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"}
+  my_proxylite: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/ProxyLite.list"}
+  my_ai: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/AI.list"}
+  my_ai_exe: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/ai-exe.list"}
+  my_direct: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/Direct.list"}
+  my_wm: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/wm.list"}
+  ai_domain: {!!merge <<: *domain, url: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/ai.mrs"}
+  openai_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.mrs"}
+  google_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"}
+  google_gemini_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google-gemini.mrs"}
+  github_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs"}
+  telegram_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs"}
+  netflix_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs"}
+  paypal_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/paypal.mrs"}
+  onedrive_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/onedrive.mrs"}
+  microsoft_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs"}
+  apple_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple-cn.mrs"}
+  speedtest_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/ookla-speedtest.mrs"}
+  tiktok_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs"}
+  gfw_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/gfw.mrs"}
+  geolocation-!cn: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"}
+  cn_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"}
+  facebook_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/facebook.mrs"}
+  whatsapp_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/whatsapp.mrs"}
+  instagram_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/instagram.mrs"}
+  linkedin_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/linkedin.mrs"}
+  x_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.mrs"}
+  cloudflare_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cloudflare.mrs"}
+  cn_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
+  google_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs"}
+  telegram_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs"}
+  netflix_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs"}
+  facebook_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/facebook.mrs"}
+  cloudflare_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cloudflare.mrs"}

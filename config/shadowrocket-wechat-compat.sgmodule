@@ -1,0 +1,7 @@
+#!name=WeChat Direct Compatibility
+#!desc=Optional iPhone WeChat direct-routing helper for message delivery and mini-program stability
+
+[Rule]
+USER-AGENT,MicroMessenger*,DIRECT
+USER-AGENT,WeChat*,DIRECT
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/WeChat/WeChat.list,DIRECT

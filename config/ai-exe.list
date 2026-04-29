@@ -1,0 +1,17 @@
+#PROCESS-NAME
+PROCESS-NAME,cursor.exe
+PROCESS-NAME,cursor-tunnel.exe
+PROCESS-NAME,cursor.cmd
+PROCESS-NAME,code.cmd
+
+#DOMAIN-KEYWORD
+DOMAIN-KEYWORD,cursor
+
+#DOMAIN-SUFFIX
+DOMAIN-SUFFIX,cursor.com
+DOMAIN-SUFFIX,elevenlabs.io
+DOMAIN-SUFFIX,cursor.sh
+DOMAIN-SUFFIX,marketplace.cursorapi.com
+DOMAIN-SUFFIX,download.todesktop.com
+DOMAIN-SUFFIX,cursor-cdn.com
+DOMAIN-SUFFIX,amazonaws.com
