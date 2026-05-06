@@ -49,9 +49,13 @@ payload:
   - DOMAIN-SUFFIX,aistudio.google.com
   - DOMAIN-SUFFIX,research.google.com
   - DOMAIN-SUFFIX,augmentcode.com
-  - DOMAIN,cdn.usefathom.com
-  - DOMAIN,ai.google.dev
-  - DOMAIN,alkalimakersuite-pa.clients6.google.com
-  - DOMAIN,generativelanguage.googleapis.com
-  - DOMAIN,makersuite.google.com
-  - DOMAIN,challenges.cloudflare.com
+  - DOMAIN-SUFFIX,cdn.usefathom.com
+  - DOMAIN-SUFFIX,ai.google.dev
+  - DOMAIN-SUFFIX,alkalimakersuite-pa.clients6.google.com
+  - DOMAIN-SUFFIX,generativelanguage.googleapis.com
+  - DOMAIN-SUFFIX,makersuite.google.com
+  - DOMAIN-KEYWORD,challenges.cloudflare.com
+  - DOMAIN-KEYWORD,antigravity
+  - DOMAIN-KEYWORD,googleapis
+  - DOMAIN-KEYWORD,antigravity-unleash
+  - DOMAIN-KEYWORD,antigravity-unleash.goog

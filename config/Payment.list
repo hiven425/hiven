@@ -1,0 +1,9 @@
+# 收款/风控/KYC 相关域名，默认优先走家宽节点
+DOMAIN-SUFFIX,stripe.com
+DOMAIN-SUFFIX,stripe.network
+DOMAIN-SUFFIX,stripeassets.com
+DOMAIN-SUFFIX,wise.com
+DOMAIN-SUFFIX,transferwise.com
+DOMAIN-SUFFIX,payoneer.com
+DOMAIN-SUFFIX,payoneerassets.com
+DOMAIN-SUFFIX,worldfirst.com

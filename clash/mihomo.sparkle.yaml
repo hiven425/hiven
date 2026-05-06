@@ -1,25 +1,11 @@
-# Nikki / OpenWrt full Mihomo profile.
-# Shared policy logic is mirrored from clash/mihomo.base.yaml.
-
-proxy-providers:
-   Airport_01:
-    type: http
-    interval: 1800
-    health-check:
-      enable: true
-      url: https://www.gstatic.com/generate_204
-      interval: 300
-    proxy: DIRECT
-    url: ""
-
 port: 7890
 socks-port: 7891
 redir-port: 7892
 mixed-port: 7893
 tproxy-port: 7894
 ipv6: false
-allow-lan: true
-bind-address: '*'
+allow-lan: false
+bind-address: "127.0.0.1"
 unified-delay: true
 tcp-concurrent: true
 
@@ -33,7 +19,7 @@ geox-url:
   asn: "https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb"
 
 # Control Panel
-external-controller: '127.0.0.1:9090'
+external-controller: "127.0.0.1:9090"
 secret: ""
 external-ui: ui
 external-ui-url: "https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
@@ -78,14 +64,14 @@ tun:
   dns-hijack:
     - 'any:53'
     - 'tcp://any:53'
-  auto-route: false
-  auto-redirect: false
-  auto-detect-interface: false
+  auto-route: true
+  auto-redirect: true
+  auto-detect-interface: true
 
 # DNS Configuration
 dns:
   enable: true
-  listen: '0.0.0.0:1053'
+  listen: '127.0.0.1:1053'
   ipv6: false
   respect-rules: true
   enhanced-mode: fake-ip
@@ -132,14 +118,12 @@ dns:
 
 # ----------------- 锚点与模板 (Templates & Anchors) -----------------
 templates:
-  # url-test 模板
   - &url_test_template
     type: url-test
     include-all: true
     tolerance: 50
     interval: 900
-  
-  # 常用代理列表模板
+
   - &GlobalProxies
     type: select
     proxies: [♻️ 自动选择, 🚀 节点选择, DIRECT]
@@ -161,15 +145,13 @@ templates:
   - &SpeedtestProxies
     type: select
     proxies: [DIRECT, ♻️ 自动选择, 🚀 节点选择]
-    
+
 # ----------------- 策略组 (Proxy Groups) -----------------
 proxy-groups:
-  # --- 主要选择组 ---
   - name: 🚀 节点选择
     type: select
     proxies: [🏚️ 家宽节点, ♻️ 自动选择, 🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
-  
-  # --- 服务专用策略组 (使用模板) ---
+
   - name: 📹 YouTube
     <<: *YouTubeProxies
   - name: 🍀 Google
@@ -204,42 +186,33 @@ proxy-groups:
     type: select
     proxies: [REJECT]
 
-  # ----------------- 节点筛选与自动分组 (使用精确模板) -----------------
-  # --- 香港节点 ---
   - name: 🇭🇰 香港节点
     <<: *url_test_template
     filter: '^(?=.*(?i)(?:香港|港|🇭🇰|HK|Hong Kong|HKG|沪港|深港|Kowloon|Victoria))(?!.*(?i)(?:美|🇺🇸|US|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
 
-  # --- 美国节点 ---
   - name: 🇺🇲 美国节点
     <<: *url_test_template
     filter: '^(?=.*(?i)(?:美|🇺🇸|US|USA|States|American|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|New York|Miami|Boston|United States|San Francisco))(?!.*(?i)(?:港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
 
-  # --- 日本节点 ---
   - name: 🇯🇵 日本节点
     <<: *url_test_template
     filter: '^(?=.*(?i)(?:日本|🇯🇵|JP|NRT|KIX|FUK|Japan|川日|东京|大阪|泉日|埼玉|名古屋|Nagoya|Kyoto|Okinawa))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
-    
-  # --- 台湾节点 ---
+
   - name: 🇹🇼 台湾节点
     <<: *url_test_template
     filter: '^(?=.*(?i)(?:台湾|台|🇹🇼|TW|TPE|KHH|Taiwan|新北|彰化|台北|Taipei|高雄|Kaohsiung|Taichung|台中))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
 
-  # --- 新加坡节点 ---
   - name: 🇸🇬 新加坡节点
     <<: *url_test_template
     filter: '^(?=.*(?i)(?:新加坡|坡|狮城|🇸🇬|SG|SIN|Singapore|Changi|Marina Bay))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
 
-  # --- 其他节点 (Catch-all) ---
   - name: 🌍 其他节点
     <<: *url_test_template
     filter: '^(?!.*(?i)(?:美|🇺🇸|US|日本|🇯🇵|JP|台湾|🇹🇼|TW|新加坡|🇸🇬|SG|香港|🇭🇰|HK|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
-  # --- 家宽节点---
   - name: 🏚️ 家宽节点
     <<: *url_test_template
     filter: '^(?=.*(?i)(?:家宽))(?!.*(?i)(?:亚洲|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
 
-  # ----------------- 综合策略组 -----------------
   - name: ♻️ 自动选择
     type: url-test
     proxies: [🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
@@ -289,13 +262,12 @@ rules:
   - RULE-SET,cloudflare_ip,☁️ cloudflare,no-resolve
   - RULE-SET,cn_ip,🎯 全球直连
   - MATCH,🐟 漏网之鱼
-  # Rule Anchors
+
 rule-anchor:
   ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
   domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
   class: &class {type: http, interval: 86400, behavior: classical, format: text}
 
-# Rule Providers - Preserved from original template
 rule-providers:
   youtube_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs"}
   private_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"}
