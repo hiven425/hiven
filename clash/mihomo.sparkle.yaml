@@ -21,7 +21,7 @@ external-controller: "127.0.0.1:9090"
 # secret 留空，部署后请在本机/客户端面板自行设置一个独立密钥；公共配置中不应硬编码
 secret: ""
 external-ui: ui
-external-ui-url: "https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
+external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip"
 
 # Core Behavior
 find-process-mode: always
