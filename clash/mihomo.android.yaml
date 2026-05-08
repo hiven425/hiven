@@ -1,9 +1,13 @@
+# Android mihomo profile - 兼容 ClashMetaForAndroid (CMFA) 与 FlClash
+# 两个客户端都内置 mihomo 内核与 VpnService,会接管 tun/external-controller 的部分字段。
+# 本文件保留通用规则与策略组,差异字段以 Android 单机使用为基准。
+
 port: 7890
 socks-port: 7891
 mixed-port: 7893
 ipv6: false
 allow-lan: false
-bind-address: "127.0.0.1"
+bind-address: '127.0.0.1'
 unified-delay: true
 tcp-concurrent: true
 
@@ -16,18 +20,18 @@ geox-url:
   mmdb: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
   asn: "https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb"
 
-# Control Panel
-external-controller: "127.0.0.1:9090"
-# secret 留空，部署后请在本机/客户端面板自行设置一个独立密钥；公共配置中不应硬编码
+# Control Panel - CMFA/FlClash 自带面板,external-ui 留空避免冗余
+external-controller: '127.0.0.1:9090'
+# secret 留空；公共配置中不应硬编码，由部署者本机自行设置
 secret: ""
-external-ui: ui
-external-ui-url: "https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
 
 # Core Behavior
-find-process-mode: always
+# find-process-mode: Android 不支持 PROCESS-NAME 匹配(仅 UID),关闭以节省资源
+# keep-alive 调短以应对 Doze 模式下的长连接断流
+find-process-mode: 'off'
 global-client-fingerprint: chrome
-keep-alive-idle: 600
-keep-alive-interval: 30
+keep-alive-idle: 30
+keep-alive-interval: 15
 
 # Profile Settings
 profile:
@@ -55,18 +59,18 @@ sniffer:
     - '+.push.apple.com'
     - '+.apple.com'
 
-# TUN Mode Configuration
+# TUN Mode - Android VpnService 会覆盖大部分字段,此处仅保留 mihomo 自身能识别的兜底
 tun:
   enable: true
-  stack: mixed
-  mtu: 1500
+  stack: system
+  mtu: 9000             # Android VpnService 推荐 9000 提升吞吐
   dns-hijack:
     - 'any:53'
     - 'tcp://any:53'
   auto-route: true
   auto-detect-interface: true
 
-# DNS Configuration
+# DNS
 dns:
   enable: true
   listen: '127.0.0.1:1053'
@@ -224,8 +228,8 @@ proxy-groups:
     max-failed-times: 3
 
 # ----------------- 规则 (Rules) -----------------
+# Android 不支持 PROCESS-NAME 匹配,已移除 Speedtest.exe 规则
 rules:
-  - PROCESS-NAME,Speedtest.exe,✈️ Speedtest
   - DOMAIN-SUFFIX,linux.do,♻️ 自动选择
   - RULE-SET,private_domain,DIRECT
   - RULE-SET,my_direct,DIRECT

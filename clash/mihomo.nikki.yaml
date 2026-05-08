@@ -1,30 +1,35 @@
+# OpenWrt nikki (https://github.com/nikkinikki-org/OpenWrt-nikki) 透明代理 profile
+# nikki 会通过 LuCI 的 Mixin 选项进一步覆盖此处配置；本文件可独立运行。
+
 port: 7890
 socks-port: 7891
 mixed-port: 7893
+redir-port: 7892        # 透明代理 (REDIRECT) 端口，nikki nftables 跳转目标
+tproxy-port: 7894       # 透明代理 (TPROXY) 端口，nikki nftables 跳转目标
 ipv6: false
-allow-lan: false
-bind-address: "127.0.0.1"
+allow-lan: true         # 路由器需要服务 LAN 客户端
+bind-address: '*'       # 监听所有接口（包含 br-lan）
 unified-delay: true
 tcp-concurrent: true
 
 # GeoData Settings
 geo-auto-update: true
-geo-update-interval: 48
+geo-update-interval: 24
 geox-url:
   geoip: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
   geosite: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
   mmdb: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
   asn: "https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb"
 
-# Control Panel
-external-controller: "127.0.0.1:9090"
-# secret 留空，部署后请在本机/客户端面板自行设置一个独立密钥；公共配置中不应硬编码
+# Control Panel - 因 allow-lan: true 且监听 0.0.0.0，secret 务必由部署者本机自行设置；
+# 公共配置不得硬编码（否则任何拿到此配置的人都能访问你的路由器 mihomo 控制 API）
+external-controller: '0.0.0.0:9090'
 secret: ""
 external-ui: ui
-external-ui-url: "https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
+external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip"
 
-# Core Behavior
-find-process-mode: always
+# Core Behavior - 路由器场景关闭进程匹配（不可靠且占用 CPU）
+find-process-mode: 'off'
 global-client-fingerprint: chrome
 keep-alive-idle: 600
 keep-alive-interval: 30
@@ -55,21 +60,23 @@ sniffer:
     - '+.push.apple.com'
     - '+.apple.com'
 
-# TUN Mode Configuration
+# TUN Mode - nikki 默认透明代理走 nftables redirect/tproxy；TUN 作为补充
 tun:
   enable: true
-  stack: mixed
+  stack: system          # Linux 原生 TUN 性能最佳
+  device: nikki
   mtu: 1500
   dns-hijack:
     - 'any:53'
     - 'tcp://any:53'
   auto-route: true
+  auto-redirect: true    # nikki/OpenWrt 专属：自动管理 nftables 透明代理规则
   auto-detect-interface: true
 
-# DNS Configuration
+# DNS - listen 端口供 dnsmasq/openwrt 转发；启用 fake-ip 提升性能
 dns:
   enable: true
-  listen: '127.0.0.1:1053'
+  listen: '0.0.0.0:1053'
   ipv6: false
   respect-rules: true
   enhanced-mode: fake-ip
@@ -78,6 +85,7 @@ dns:
   fake-ip-filter:
     - '+.lan'
     - '+.local'
+    - '+.openwrt'
     - geosite:private
     - geosite:cn
   default-nameserver:
@@ -224,8 +232,8 @@ proxy-groups:
     max-failed-times: 3
 
 # ----------------- 规则 (Rules) -----------------
+# 路由器场景下 PROCESS-NAME 不可用（find-process-mode: off），已移除 Speedtest.exe 规则
 rules:
-  - PROCESS-NAME,Speedtest.exe,✈️ Speedtest
   - DOMAIN-SUFFIX,linux.do,♻️ 自动选择
   - RULE-SET,private_domain,DIRECT
   - RULE-SET,my_direct,DIRECT
