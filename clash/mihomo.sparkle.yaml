@@ -151,7 +151,11 @@ templates:
 proxy-groups:
   - name: 🚀 节点选择
     type: select
-    proxies: [🏚️ 家宽节点, ♻️ 自动选择, 🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
+    proxies: [手动选择, 🏚️ 家宽节点, ♻️ 自动选择, 🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
+
+  - name: 手动选择
+    type: select
+    include-all: true
 
   - name: 📹 YouTube
     <<: *YouTubeProxies
