@@ -5,7 +5,7 @@
 port: 7890
 socks-port: 7891
 mixed-port: 7893
-ipv6: false
+ipv6: true
 allow-lan: false
 bind-address: '127.0.0.1'
 unified-delay: true
@@ -29,7 +29,6 @@ secret: ""
 # find-process-mode: Android 不支持 PROCESS-NAME 匹配(仅 UID),关闭以节省资源
 # keep-alive 调短以应对 Doze 模式下的长连接断流
 find-process-mode: 'off'
-global-client-fingerprint: chrome
 keep-alive-idle: 30
 keep-alive-interval: 15
 
@@ -64,6 +63,9 @@ tun:
   enable: true
   stack: system
   mtu: 9000             # Android VpnService 推荐 9000 提升吞吐
+  # 为 IPv6 Fake-IP 提供独立 TUN 地址；客户端若不支持会由 VpnService 覆盖。
+  inet6-address:
+    - fdfe:dcba:9877::1/126
   dns-hijack:
     - 'any:53'
     - 'tcp://any:53'
@@ -74,10 +76,13 @@ tun:
 dns:
   enable: true
   listen: '127.0.0.1:1053'
-  ipv6: false
+  ipv6: true
   respect-rules: true
   enhanced-mode: fake-ip
-  fake-ip-range: 28.0.0.1/8
+  # 使用 RFC 2544 基准测试保留网段，避免与真实公网地址冲突。
+  fake-ip-range: 198.18.0.0/15
+  # IPv6 Fake-IP 使用 ULA 网段，避免 AAAA 查询在开启 IPv6 后返回空结果。
+  fake-ip-range6: fdfe:dcba:9876::1/64
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
     - '+.lan'
@@ -88,15 +93,15 @@ dns:
     - 223.5.5.5
     - 119.29.29.29
   proxy-server-nameserver:
-    - https://dns.google/dns-query
-    - https://dns.cloudflare.com/dns-query
-  nameserver:
+    # 节点域名先用境内 DoH 解析，避免启动阶段形成“先有代理还是先有 DNS”的循环依赖。
     - https://dns.alidns.com/dns-query
     - https://doh.pub/dns-query
-  # 备用解析使用境外加密 DNS，配合 fallback-filter 降低海外域名被国内解析结果污染的概率。
-  fallback:
-    - tls://8.8.4.4
-    - tls://1.1.1.1
+  nameserver:
+    - https://dns.cloudflare.com/dns-query
+    - https://dns.google/dns-query
+  direct-nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
   nameserver-policy:
     'rule-set:private_domain,cn_domain':
       - https://dns.alidns.com/dns-query
@@ -104,19 +109,6 @@ dns:
     'geosite:geolocation-!cn':
       - https://dns.cloudflare.com/dns-query
       - https://dns.google/dns-query
-  fallback-filter:
-    geoip: true
-    geoip-code: CN
-    geosite:
-      - gfw
-    ipcidr:
-      - 240.0.0.0/4
-      - 0.0.0.0/32
-      - 127.0.0.1/32
-    domain:
-      - '+.google.com'
-      - '+.facebook.com'
-      - '+.youtube.com'
 
 # ----------------- 锚点与模板 (Templates & Anchors) -----------------
 templates:
@@ -146,7 +138,7 @@ templates:
     proxies: [🏚️ 家宽节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇸🇬 新加坡节点, 🇹🇼 台湾节点, ♻️ 自动选择, 🚀 节点选择]
   - &YouTubeProxies
     type: select
-    proxies: [🏚️ 家宽节点, 🇺🇲 美国节点, 🇸🇬 新加坡节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, ♻️ 自动选择, 🚀 节点选择]
+    proxies: [♻️ 自动选择, 🇺🇲 美国节点, 🇸🇬 新加坡节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🏚️ 家宽节点, 🚀 节点选择]
   - &SpeedtestProxies
     type: select
     proxies: [DIRECT, ♻️ 自动选择, 🚀 节点选择]
@@ -155,7 +147,11 @@ templates:
 proxy-groups:
   - name: 🚀 节点选择
     type: select
-    proxies: [🏚️ 家宽节点, ♻️ 自动选择, 🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
+    proxies: [手动选择, 🏚️ 家宽节点, ♻️ 自动选择, 🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
+
+  - name: 手动选择
+    type: select
+    include-all: true
 
   - name: 📹 YouTube
     <<: *YouTubeProxies
@@ -186,37 +182,38 @@ proxy-groups:
   - name: 🎯 全球直连
     <<: *DirectFirst
   - name: 🐟 漏网之鱼
-    <<: *DirectFirst
+    <<: *GlobalProxies
   - name: 🛑 广告拦截
     type: select
     proxies: [REJECT]
 
   - name: 🇭🇰 香港节点
     <<: *url_test_template
-    filter: '^(?=.*(?i)(?:香港|港|🇭🇰|HK|Hong Kong|HKG|沪港|深港|Kowloon|Victoria))(?!.*(?i)(?:美|🇺🇸|US|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+    filter: '^(?=.*(?i)(?:香港|港|🇭🇰|HK|Hong Kong|HKG|沪港|深港|Kowloon|Victoria))(?!.*(?i)(?:美|🇺🇸|US|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
 
   - name: 🇺🇲 美国节点
     <<: *url_test_template
-    filter: '^(?=.*(?i)(?:美|🇺🇸|US|USA|States|American|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|New York|Miami|Boston|United States|San Francisco))(?!.*(?i)(?:港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+    filter: '^(?=.*(?i)(?:美|🇺🇸|US|USA|States|American|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|New York|Miami|Boston|United States|San Francisco))(?!.*(?i)(?:港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
 
   - name: 🇯🇵 日本节点
     <<: *url_test_template
-    filter: '^(?=.*(?i)(?:日本|🇯🇵|JP|NRT|KIX|FUK|Japan|川日|东京|大阪|泉日|埼玉|名古屋|Nagoya|Kyoto|Okinawa))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+    filter: '^(?=.*(?i)(?:日本|🇯🇵|JP|NRT|KIX|FUK|Japan|川日|东京|大阪|泉日|埼玉|名古屋|Nagoya|Kyoto|Okinawa))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|新|🇸🇬|SG|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
 
   - name: 🇹🇼 台湾节点
     <<: *url_test_template
-    filter: '^(?=.*(?i)(?:台湾|台|🇹🇼|TW|TPE|KHH|Taiwan|新北|彰化|台北|Taipei|高雄|Kaohsiung|Taichung|台中))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+    filter: '^(?=.*(?i)(?:台湾|台|🇹🇼|TW|TPE|KHH|Taiwan|新北|彰化|台北|Taipei|高雄|Kaohsiung|Taichung|台中))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
 
   - name: 🇸🇬 新加坡节点
     <<: *url_test_template
-    filter: '^(?=.*(?i)(?:新加坡|坡|狮城|🇸🇬|SG|SIN|Singapore|Changi|Marina Bay))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+    filter: '^(?=.*(?i)(?:新加坡|坡|狮城|🇸🇬|SG|SIN|Singapore|Changi|Marina Bay))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
 
   - name: 🌍 其他节点
     <<: *url_test_template
-    filter: '^(?!.*(?i)(?:美|🇺🇸|US|日本|🇯🇵|JP|台湾|🇹🇼|TW|新加坡|🇸🇬|SG|香港|🇭🇰|HK|韩|🇰🇷|KR|专线|倍率|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+    filter: '^(?!.*(?i)(?:美|🇺🇸|US|日本|🇯🇵|JP|台湾|🇹🇼|TW|新加坡|🇸🇬|SG|香港|🇭🇰|HK|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
   - name: 🏚️ 家宽节点
     <<: *url_test_template
-    filter: '^(?=.*(?i)(?:家宽))(?!.*(?i)(?:亚洲|到期|过期|剩余|流量|时间|官网|产品|倍率\\s*(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?|(?:[6-9]|[1-9]\\d)(?:\\.\\d+)?\\s*(?:x|×|倍))).*$'
+    # 只保留同时带有家宽和美国标识的节点。
+    filter: '^(?=.*(?i)(?:家宽))(?=.*(?i)(?:美国|🇺🇸|(?:^|[^A-Za-z])(?:US|USA)(?:[^A-Za-z]|$)|United States|American|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|New York|Miami|Boston|San Francisco))(?!.*(?i)(?:亚洲|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
 
   - name: ♻️ 自动选择
     type: url-test
