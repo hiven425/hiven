@@ -1,0 +1,6 @@
+# Windows Update 检测、元数据和更新服务控制面
+DOMAIN,fe2.update.microsoft.com
+DOMAIN,sls.update.microsoft.com
+DOMAIN-SUFFIX,api.cdp.microsoft.com
+DOMAIN-SUFFIX,update.microsoft.com
+DOMAIN-SUFFIX,delivery.mp.microsoft.com

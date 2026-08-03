@@ -163,6 +163,9 @@ proxy-groups:
     <<: *AIProxies
   - name: 🍒 microsoft
     <<: *OfficeProxies
+  - name: 📦 微软大流量
+    type: select
+    proxies: [DIRECT, 🚀 节点选择]
   - name: 🏹 ChatGPT
     <<: *AIProxies
   - name: 💻 GitHub
@@ -231,6 +234,10 @@ proxy-groups:
 rules:
   - PROCESS-NAME,Speedtest.exe,✈️ Speedtest
   - DOMAIN-SUFFIX,linux.do,♻️ 自动选择
+  # Microsoft 大流量下载必须先于控制面和通用 Microsoft 规则匹配。
+  - RULE-SET,microsoft_download,📦 微软大流量
+  - RULE-SET,microsoft_direct,DIRECT
+  - RULE-SET,microsoft_proxy,🍒 microsoft
   - RULE-SET,private_domain,DIRECT
   - RULE-SET,my_direct,DIRECT
   - RULE-SET,apple_domain,🍎 Apple
@@ -284,6 +291,9 @@ rule-providers:
   my_ai_exe: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/ai-exe.list"}
   my_direct: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/Direct.list"}
   my_wm: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/wm.list"}
+  microsoft_download: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/MicrosoftDownload.list"}
+  microsoft_direct: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/MicrosoftDirect.list"}
+  microsoft_proxy: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/MicrosoftProxy.list"}
   ai_domain: {!!merge <<: *domain, url: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/ai.mrs"}
   openai_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.mrs"}
   google_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"}
