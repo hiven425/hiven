@@ -1,0 +1,12 @@
+# Microsoft Store 页面、目录、认证、授权和 Delivery Optimization 调度
+DOMAIN,storeedge.microsoft.com
+DOMAIN-SUFFIX,storeedgefd.dsx.mp.microsoft.com
+DOMAIN-SUFFIX,displaycatalog.mp.microsoft.com
+DOMAIN-SUFFIX,displaycatalog.md.mp.microsoft.com
+DOMAIN-SUFFIX,licensing.mp.microsoft.com
+DOMAIN-SUFFIX,licensing.md.mp.microsoft.com
+DOMAIN-SUFFIX,purchase.mp.microsoft.com
+DOMAIN-SUFFIX,purchase.md.mp.microsoft.com
+DOMAIN,login.live.com
+DOMAIN,tsfe.trafficshaping.dsp.mp.microsoft.com
+DOMAIN-SUFFIX,prod.do.dsp.mp.microsoft.com

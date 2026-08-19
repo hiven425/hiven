@@ -1,9 +1,13 @@
+# Mihomo for WSL2 + Docker
+# Docker 版源配置：clash/mihomo.sparkle.yaml；更新路由规则时应同步维护两份。
+# 使用前只需要替换：secret 与 proxy-providers 中的 4 个订阅 URL。
+
 port: 7890
 socks-port: 7891
 mixed-port: 7893
-ipv6: true
-allow-lan: false
-bind-address: "127.0.0.1"
+ipv6: false
+allow-lan: true
+bind-address: "*"
 unified-delay: true
 tcp-concurrent: true
 
@@ -17,14 +21,15 @@ geox-url:
   asn: "https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb"
 
 # Control Panel
-external-controller: "127.0.0.1:9090"
-# secret 留空，部署后请在本机/客户端面板自行设置一个独立密钥；公共配置中不应硬编码
-secret: ""
+# Docker 容器内必须监听 0.0.0.0，宿主机暴露范围由 compose.yaml 控制。
+external-controller: "0.0.0.0:9090"
+secret: "CHANGE_ME_TO_A_LONG_RANDOM_SECRET"
 external-ui: ui
 external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip"
 
 # Core Behavior
-find-process-mode: always
+# 容器看不到 Windows/其他容器的真实进程，关闭进程识别。
+find-process-mode: off
 keep-alive-idle: 600
 keep-alive-interval: 30
 
@@ -54,33 +59,18 @@ sniffer:
     - '+.push.apple.com'
     - '+.apple.com'
 
-# TUN Mode Configuration
+# 当前 compose 未配置 NET_ADMIN 和 /dev/net/tun；作为 sub2api 的 HTTP 代理无需 TUN。
 tun:
-  enable: true
-  stack: mixed
-  mtu: 1500
-  # IPv6 Fake-IP 使用独立 TUN 地址，配合 strict-route 防止绕过。
-  inet6-address:
-    - fdfe:dcba:9877::1/126
-  dns-hijack:
-    - 'any:53'
-    - 'tcp://any:53'
-  auto-route: true
-  auto-detect-interface: true
-  # Windows 下阻止多网卡、系统 DNS 和 IPv6 绕过 TUN；代价是局域网入站访问可能受限。
-  strict-route: true
+  enable: false
 
 # DNS Configuration
 dns:
   enable: true
   listen: '127.0.0.1:1053'
-  ipv6: true
+  ipv6: false
   respect-rules: true
   enhanced-mode: fake-ip
-  # 使用 RFC 2544 基准测试保留网段，避免与真实公网地址冲突。
   fake-ip-range: 198.18.0.0/15
-  # IPv6 Fake-IP 使用 ULA 网段，避免 AAAA 查询在开启 IPv6 后返回空结果。
-  fake-ip-range6: fdfe:dcba:9876::1/64
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
     - '+.lan'
@@ -90,15 +80,12 @@ dns:
   default-nameserver:
     - 223.5.5.5
     - 119.29.29.29
-  # 只负责解析代理节点域名，必须能够在代理尚未建立时直连访问。
   proxy-server-nameserver:
     - https://dns.alidns.com/dns-query
     - https://doh.pub/dns-query
-  # 境外域名的加密 DNS 按规则通过当前代理，减少本地 DNS 暴露。
   nameserver:
     - https://1.1.1.1/dns-query
     - https://dns.google/dns-query
-  # DIRECT 流量使用国内 DoH，兼顾国内 CDN 命中与解析可用性。
   direct-nameserver:
     - https://dns.alidns.com/dns-query
     - https://doh.pub/dns-query
@@ -109,6 +96,62 @@ dns:
     'geosite:geolocation-!cn':
       - https://dns.cloudflare.com/dns-query
       - https://dns.google/dns-query
+
+# 节点订阅与主配置分离。
+# 只替换下面 4 个 URL；不要把真实订阅链接提交到公开仓库。
+# 冷启动时订阅默认直连下载，避免所有节点尚未加载时形成代理循环依赖。
+proxy-providers:
+  helen:
+    type: http
+    url: "https://replace.invalid/helen-subscription"
+    path: ./proxy_providers/helen.yaml
+    interval: 3600
+    health-check:
+      enable: true
+      url: "https://www.gstatic.com/generate_204"
+      interval: 900
+      timeout: 5000
+      lazy: true
+      expected-status: 204
+
+  linux-bkm:
+    type: http
+    url: "https://replace.invalid/linux-bkm-subscription"
+    path: ./proxy_providers/linux-bkm.yaml
+    interval: 3600
+    health-check:
+      enable: true
+      url: "https://www.gstatic.com/generate_204"
+      interval: 900
+      timeout: 5000
+      lazy: true
+      expected-status: 204
+
+  vless:
+    type: http
+    url: "https://replace.invalid/vless-subscription"
+    path: ./proxy_providers/vless.yaml
+    interval: 3600
+    health-check:
+      enable: true
+      url: "https://www.gstatic.com/generate_204"
+      interval: 900
+      timeout: 5000
+      lazy: true
+      expected-status: 204
+
+  linux-share:
+    type: http
+    url: "https://replace.invalid/linux-share-subscription"
+    path: ./proxy_providers/linux-share.yaml
+    interval: 3600
+    health-check:
+      enable: true
+      url: "https://www.gstatic.com/generate_204"
+      interval: 900
+      timeout: 5000
+      lazy: true
+      expected-status: 204
 
 # ----------------- 锚点与模板 (Templates & Anchors) -----------------
 templates:
@@ -213,9 +256,9 @@ proxy-groups:
   - name: 🌍 其他节点
     <<: *url_test_template
     filter: '^(?!.*(?i)(?:美|🇺🇸|US|日本|🇯🇵|JP|台湾|🇹🇼|TW|新加坡|🇸🇬|SG|香港|🇭🇰|HK|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
+
   - name: 🏚️ 家宽节点
     <<: *url_test_template
-    # 只保留同时带有家宽和美国标识的节点。
     filter: '^(?=.*(?i)(?:家宽))(?=.*(?i)(?:美国|🇺🇸|(?:^|[^A-Za-z])(?:US|USA)(?:[^A-Za-z]|$)|United States|American|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|New York|Miami|Boston|San Francisco))(?!.*(?i)(?:亚洲|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
 
   - name: ♻️ 自动选择
@@ -229,12 +272,11 @@ proxy-groups:
 
 # ----------------- 规则 (Rules) -----------------
 rules:
-  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
-  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
-  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
-  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
-  - PROCESS-NAME,Speedtest.exe,✈️ Speedtest
   - DOMAIN-SUFFIX,linux.do,♻️ 自动选择
+  # Microsoft 大流量下载必须先于控制面和通用 Microsoft 规则匹配。
+  - RULE-SET,microsoft_download,📦 微软大流量
+  - RULE-SET,microsoft_direct,DIRECT
+  - RULE-SET,microsoft_proxy,🍒 microsoft
   - RULE-SET,private_domain,DIRECT
   - RULE-SET,my_direct,DIRECT
   - RULE-SET,apple_domain,🍎 Apple
@@ -254,10 +296,6 @@ rules:
   - RULE-SET,google_domain,🍀 Google
   - RULE-SET,google_gemini_domain,🍀 Google
   - RULE-SET,onedrive_domain,🍒 microsoft
-  # Microsoft 大流量下载先于控制面和通用 Microsoft 规则匹配。
-  - RULE-SET,microsoft_download,📦 微软大流量
-  - RULE-SET,microsoft_direct,DIRECT
-  - RULE-SET,microsoft_proxy,🍒 microsoft
   - RULE-SET,microsoft_domain,🍒 microsoft
   - RULE-SET,cloudflare_domain,☁️ cloudflare
   - RULE-SET,tiktok_domain,🎵 TikTok
