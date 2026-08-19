@@ -31,3 +31,6 @@ DOMAIN-SUFFIX,poolhub.me
 DOMAIN-SUFFIX,jollyroger.top
 DOMAIN-SUFFIX,weyolo.com
 DOMAIN-SUFFIX,anyrouter.top
+DOMAIN-SUFFIX,argotunnel.com
+DOMAIN-SUFFIX,trycloudflare.com
+PROCESS-NAME,cloudflared.exe
