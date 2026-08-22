@@ -20,8 +20,14 @@ const POLICY = {
     1: 30,  // conor-bkm-100
     4: 40,  // hiven-linux-bkm-60
     8: 100, // helen（自建/私有）
-    6: 200, // linux-ss（分享池）
-    7: 210  // ss（分享池）
+    6: 200, // linux-share-8
+    7: 210, // linux-share-6
+    9: 220, // linux-share-5
+    10: 230, // linux-share-4
+    11: 240, // linux-share-9
+    12: 250, // linux-share-3
+    13: 260, // linux-share-2
+    14: 270  // linux-share-1
   },
 
   sourceTier: {
@@ -31,7 +37,13 @@ const POLICY = {
     4: "paid",
     8: "self",
     6: "shared",
-    7: "shared"
+    7: "shared",
+    9: "shared",
+    10: "shared",
+    11: "shared",
+    12: "shared",
+    13: "shared",
+    14: "shared"
   },
 
   sourceLabel: {
@@ -40,8 +52,14 @@ const POLICY = {
     3: "hiven-duck",
     4: "hiven-linux",
     8: "helen",
-    6: "linux-ss",
-    7: "ss"
+    6: "linux-share-8",
+    7: "linux-share-6",
+    9: "linux-share-5",
+    10: "linux-share-4",
+    11: "linux-share-9",
+    12: "linux-share-3",
+    13: "linux-share-2",
+    14: "linux-share-1"
   },
 
   // 未登记的新 Source 按分享池严格处理，避免未知公共来源直接进入成品订阅。
@@ -59,7 +77,11 @@ const POLICY = {
   maxUnknownCountry: 20,
 
   // 分享池必须有成功延迟，并且有正数测速；Speed 缺失时尝试从名称解析 MB/s。
-  sharedMinSpeedMBps: 0
+  sharedMinSpeedMBps: 0,
+
+  // 欺诈评分仅约束分享池。未完成质量检测时暂时放行，避免检测服务异常导致订阅清空。
+  sharedMaxFraudScore: 70,
+  sharedRequireQualityResult: false
 };
 
 const INFO_NODE_PATTERN = /(剩余流量|流量剩余|套餐到期|距离下次|下次重置|官网|官址|建议|公告|客服|工单|订阅地址|更新时间|过期时间|traffic|expire|reset|official\s*site)/i;
@@ -221,7 +243,53 @@ function measuredSpeed(node) {
   return match ? numberValue(match[1], -1) : -1;
 }
 
+function fraudScore(node) {
+  const score = numberValue(node && node.FraudScore, -1);
+  return score >= 0 && score <= 100 ? score : -1;
+}
+
+function hasCompleteQualityResult(node) {
+  const status = String((node && node.QualityStatus) || "").trim().toLowerCase();
+  return status === "success" && fraudScore(node) >= 0;
+}
+
+function passesFraudPolicy(node) {
+  if (sourceTier(node) !== "shared") {
+    return true;
+  }
+  if (!hasCompleteQualityResult(node)) {
+    return !POLICY.sharedRequireQualityResult;
+  }
+  return fraudScore(node) <= POLICY.sharedMaxFraudScore;
+}
+
+function endpointEligibilityRank(node) {
+  if (sourceTier(node) !== "shared") {
+    return 0;
+  }
+  return passesHealthPolicy(node) && passesFraudPolicy(node) ? 0 : 1;
+}
+
+function sharedQualityRank(node) {
+  if (sourceTier(node) !== "shared" || !hasCompleteQualityResult(node)) {
+    return 101;
+  }
+  return fraudScore(node);
+}
+
 function comparePreferred(a, b) {
+  const eligibilityDiff = endpointEligibilityRank(a) - endpointEligibilityRank(b);
+  if (eligibilityDiff !== 0) {
+    return eligibilityDiff;
+  }
+
+  if (sourceTier(a) === "shared" && sourceTier(b) === "shared") {
+    const qualityDiff = sharedQualityRank(a) - sharedQualityRank(b);
+    if (qualityDiff !== 0) {
+      return qualityDiff;
+    }
+  }
+
   const priorityDiff = sourcePriority(a) - sourcePriority(b);
   if (priorityDiff !== 0) {
     return priorityDiff;
@@ -340,6 +408,13 @@ function filterNode(nodes, clientType) {
   result = result.filter(passesHealthPolicy);
   stats.healthy = result.length;
 
+  stats.qualityComplete = result.filter((node) => (
+    sourceTier(node) === "shared" && hasCompleteQualityResult(node)
+  )).length;
+  const beforeFraud = result.length;
+  result = result.filter(passesFraudPolicy);
+  stats.fraudRejected = beforeFraud - result.length;
+
   result.sort(compareFinal);
   result = limitByCountry(result);
   stats.limited = result.length;
@@ -353,6 +428,8 @@ function filterNode(nodes, clientType) {
     " exact=" + stats.exact +
     " endpoint=" + stats.endpoint +
     " healthy=" + stats.healthy +
+    " qualityComplete=" + stats.qualityComplete +
+    " fraudRejected=" + stats.fraudRejected +
     " output=" + result.length
   );
   return result;

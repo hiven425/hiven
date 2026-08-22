@@ -25,6 +25,8 @@ function node(overrides = {}) {
     SourceID: 1,
     DelayTime: -1,
     Speed: -1,
+    FraudScore: -1,
+    QualityStatus: "untested",
     ContentHash: "hash-1",
     ...overrides
   };
@@ -64,6 +66,51 @@ function node(overrides = {}) {
   ], "clash");
   assert.equal(output.length, 1);
   assert.equal(output[0].ContentHash, "shared-good", "分享池必须同时有延迟和测速");
+}
+
+{
+  const output = context.filterNode([
+    node({
+      ID: 1, SourceID: 6, ContentHash: "fraud-70", LinkAddress: "fraud-70.example",
+      DelayTime: 100, Speed: 1, FraudScore: 70, QualityStatus: "success"
+    }),
+    node({
+      ID: 2, SourceID: 7, ContentHash: "fraud-71", LinkAddress: "fraud-71.example",
+      DelayTime: 100, Speed: 1, FraudScore: 71, QualityStatus: "success"
+    }),
+    node({
+      ID: 3, SourceID: 9, ContentHash: "quality-pending", LinkAddress: "quality-pending.example",
+      DelayTime: 100, Speed: 1, FraudScore: -1, QualityStatus: "untested"
+    }),
+    node({
+      ID: 4, SourceID: 1, ContentHash: "paid-high-fraud", LinkAddress: "paid-high.example",
+      FraudScore: 100, QualityStatus: "success"
+    })
+  ], "clash");
+  assert.deepEqual(
+    Array.from(output, (item) => item.ContentHash).sort(),
+    ["fraud-70", "paid-high-fraud", "quality-pending"].sort(),
+    "分享池应排除完整结果中评分大于 70 的节点，同时对未检测节点 fail-open"
+  );
+}
+
+{
+  const output = context.filterNode([
+    node({
+      ID: 1, SourceID: 6, ContentHash: "same-endpoint-dirty", LinkAddress: "same-quality.example",
+      DelayTime: 50, Speed: 2, FraudScore: 95, QualityStatus: "success"
+    }),
+    node({
+      ID: 2, SourceID: 7, ContentHash: "same-endpoint-clean", LinkAddress: "same-quality.example",
+      DelayTime: 100, Speed: 1, FraudScore: 20, QualityStatus: "success"
+    })
+  ], "clash");
+  assert.equal(output.length, 1);
+  assert.equal(
+    output[0].ContentHash,
+    "same-endpoint-clean",
+    "等价端点必须优先保留可用且低欺诈的分享节点，不能先选高风险节点再过滤为空"
+  );
 }
 
 {
