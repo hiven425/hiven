@@ -36,7 +36,7 @@ function node(overrides = {}) {
     node({ ID: 2, SourceID: 1, ContentHash: "same" })
   ], "clash");
   assert.equal(output.length, 1);
-  assert.equal(output[0].SourceID, 1, "精确重复应保留高优先级来源");
+  assert.equal(output[0].SourceID, 3, "精确重复应保留高优先级来源");
 }
 
 {
@@ -50,11 +50,10 @@ function node(overrides = {}) {
 
 {
   const output = context.filterNode([
-    node({ SourceID: 4, ContentHash: "disabled" }),
+    node({ SourceID: 4, ContentHash: "monthly-reset", LinkAddress: "monthly-reset.example" }),
     node({ ID: 2, SourceID: 1, ContentHash: "active", LinkAddress: "active.example" })
   ], "clash");
-  assert.equal(output.length, 1);
-  assert.equal(output[0].SourceID, 1, "手动禁用来源必须整体排除");
+  assert.equal(output.length, 2, "会按月重置的 bkm 来源不得被脚本排除");
 }
 
 {

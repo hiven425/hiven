@@ -5,18 +5,19 @@
  *          → 分级健康过滤 → 国家限量 → 排序 → 统一重命名
  *
  * 注意：该脚本只处理已经进入 Subscription 的 Node[]，无法读取 Airport 流量。
- * Airport 流量耗尽时，先把对应 SourceID 加入 disabledSourceIDs。
+ * bkm 套餐会按月重置，不在脚本里按流量状态排除；流量状态应由外部 Eligibility
+ * Controller 根据 Subscription-Userinfo 管理，确保耗尽后排除、重置后自动恢复。
  */
 
 const POLICY = {
-  // 当前 hiven-linux-bkm-60 已耗尽；套餐恢复后从这里移除 4。
-  disabledSourceIDs: new Set([4]),
+  // 仅用于明确的人工停用；不要把会按月重置的 bkm SourceID 写在这里。
+  disabledSourceIDs: new Set(),
 
   // 数值越小，等价端点选择和最终排序的优先级越高。
   sourcePriority: {
-    1: 10,  // conor-bkm-100
+    3: 10,  // hiven-duck-bkm-60
     2: 20,  // cr-linux-bkm-60
-    3: 30,  // hiven-duck-bkm-60
+    1: 30,  // conor-bkm-100
     4: 40,  // hiven-linux-bkm-60
     8: 100, // helen（自建/私有）
     6: 200, // linux-ss（分享池）
