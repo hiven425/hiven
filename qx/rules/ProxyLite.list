@@ -1,0 +1,37 @@
+# Generated from config/ProxyLite.list; run node config/qx-rules-sync.test.js --write after edits.
+# The policy placeholder is overridden by force-policy in qx/qx.conf.
+HOST-SUFFIX,dns.google,HIVEN
+HOST-SUFFIX,1dot1dot1dot1.cloudflare-dns.com,HIVEN
+HOST-SUFFIX,dot.sb,HIVEN
+HOST-SUFFIX,dns.umbrella.com,HIVEN
+HOST-SUFFIX,dns.quad9.net,HIVEN
+HOST-SUFFIX,cloudflare-dns.com,HIVEN
+HOST-SUFFIX,doh.dns.sb,HIVEN
+HOST-SUFFIX,doh.opendns.com,HIVEN
+HOST-SUFFIX,hk-hkg.doh.sb,HIVEN
+HOST-SUFFIX,keeflys.com,HIVEN
+HOST-SUFFIX,guagua.info,HIVEN
+HOST-SUFFIX,gcore.com,HIVEN
+HOST-SUFFIX,huaweicloud.com,HIVEN
+HOST-SUFFIX,qichiyu.com,HIVEN
+HOST-SUFFIX,69yun69.com,HIVEN
+HOST-SUFFIX,koofr.net,HIVEN
+HOST-SUFFIX,v2rayssr.com,HIVEN
+HOST-SUFFIX,neonpulse.tech,HIVEN
+HOST-SUFFIX,duyaoss.com,HIVEN
+HOST-SUFFIX,missav.ai,HIVEN
+HOST-SUFFIX,twinrdsyte.com,HIVEN
+HOST-SUFFIX,pages.dev,HIVEN
+HOST-SUFFIX,huggingface.co,HIVEN
+HOST-SUFFIX,hf.space,HIVEN
+HOST-SUFFIX,faviconkit.com,HIVEN
+HOST-SUFFIX,posthog.com,HIVEN
+HOST-SUFFIX,smithery.ai,HIVEN
+HOST-SUFFIX,synology.com,HIVEN
+HOST-SUFFIX,sheerid.com,HIVEN
+HOST-SUFFIX,poolhub.me,HIVEN
+HOST-SUFFIX,jollyroger.top,HIVEN
+HOST-SUFFIX,weyolo.com,HIVEN
+HOST-SUFFIX,anyrouter.top,HIVEN
+HOST-SUFFIX,argotunnel.com,HIVEN
+HOST-SUFFIX,trycloudflare.com,HIVEN

@@ -34,15 +34,15 @@ The repo is public. Changes should assume end users may subscribe to files direc
 
 - Preserve existing Chinese comments and naming unless there is a strong reason to normalize.
 - Prefer small, targeted edits. This repo is configuration-heavy, so ordering matters.
-- Do not replace local wrapper modules with upstream modules when the local copy exists to patch behavior.
-- For Shadowrocket MITM modules, prefer `%APPEND%` in `[MITM] hostname` entries to avoid overwrite conflicts between modules.
+- Keep optional Shadowrocket wrapper modules separate from the public main config; users enable them manually when needed.
+- For optional Shadowrocket MITM modules, prefer `%APPEND%` in `[MITM] hostname` entries to avoid overwrite conflicts between modules.
 - Keep public raw URLs stable. If you rename or remove a file under `config/`, update every referencing config in the repo.
 - Avoid embedding private secrets, certificates, tokens, or personal endpoints.
 
 ## Shadowrocket-Specific Notes
 
-- `[Module]` ordering matters. Ad-block and wrapper modules can override each other.
-- Local wrapper modules under `config/shadowrocket-*.sgmodule` exist to preserve upstream behavior while fixing Shadowrocket compatibility issues.
+- The public main config must not auto-load `[Module]`, `[MITM]`, rewrite, or script resources.
+- Local wrapper modules under `config/shadowrocket-*.sgmodule` remain optional add-ons and must use `%APPEND%` for MITM hostnames.
 - Apple traffic is routed through the `🍎 Apple` policy group; the group includes `DIRECT` as one of its options so traffic can fall back to direct when needed.
 - Google traffic is intentionally routed through the `🍀 Google` group, with home broadband available first.
 - Video-heavy services such as YouTube, X, and TikTok should not default to home broadband first unless there is a specific reason.
@@ -70,7 +70,7 @@ Before finishing a change:
 - Run `git diff --check`
 - Inspect the final diff for config ordering regressions
 - If a new raw-published file was added, verify it with `curl -I`
-- If changing Shadowrocket module behavior, re-check `[Module]`, `[MITM]`, and related `[Rule]` ordering together
+- If changing an optional Shadowrocket module, verify it independently and confirm the public main config still does not auto-load it
 
 ## Git Rules
 

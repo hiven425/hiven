@@ -1,0 +1,12 @@
+# Generated from config/Direct.list; run node config/qx-rules-sync.test.js --write after edits.
+# The policy placeholder is overridden by force-policy in qx/qx.conf.
+HOST-SUFFIX,time.windows.com,HIVEN
+HOST-SUFFIX,lanzov.com,HIVEN
+HOST-SUFFIX,winnermedical.com,HIVEN
+HOST-SUFFIX,fuclaude.com,HIVEN
+HOST-SUFFIX,oaifree.com,HIVEN
+HOST-SUFFIX,ccopilot.org,HIVEN
+HOST-SUFFIX,wcloud.store,HIVEN
+HOST-SUFFIX,hybgzs.com,HIVEN
+HOST-SUFFIX,sharedchat.cc,HIVEN
+HOST-SUFFIX,v.ua,HIVEN

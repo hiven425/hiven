@@ -88,8 +88,9 @@ dns:
     - geosite:private
     - geosite:cn
   default-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
+    # 仅用于解析 DoH 主机名；使用 IP 形式的 DoH，避免明文 UDP 引导查询。
+    - https://223.5.5.5/dns-query
+    - https://1.12.12.12/dns-query
   # 只负责解析代理节点域名，必须能够在代理尚未建立时直连访问。
   proxy-server-nameserver:
     - https://dns.alidns.com/dns-query
@@ -102,6 +103,7 @@ dns:
   direct-nameserver:
     - https://dns.alidns.com/dns-query
     - https://doh.pub/dns-query
+  direct-nameserver-follow-policy: true
   nameserver-policy:
     'rule-set:private_domain,cn_domain':
       - https://dns.alidns.com/dns-query
@@ -186,10 +188,6 @@ proxy-groups:
     <<: *DirectFirst
   - name: 🐟 漏网之鱼
     <<: *GlobalProxies
-  - name: 🛑 广告拦截
-    type: select
-    proxies: [REJECT]
-
   - name: 🇭🇰 香港节点
     <<: *url_test_template
     filter: '^(?=.*(?i)(?:香港|港|🇭🇰|HK|Hong Kong|HKG|沪港|深港|Kowloon|Victoria))(?!.*(?i)(?:美|🇺🇸|US|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
@@ -233,6 +231,9 @@ rules:
   - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
   - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
   - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR6,::1/128,DIRECT,no-resolve
+  - IP-CIDR6,fc00::/7,DIRECT,no-resolve
+  - IP-CIDR6,fe80::/10,DIRECT,no-resolve
   - PROCESS-NAME,Speedtest.exe,✈️ Speedtest
   - DOMAIN-SUFFIX,linux.do,♻️ 自动选择
   - RULE-SET,private_domain,DIRECT
@@ -308,7 +309,6 @@ rule-providers:
   apple_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple-cn.mrs"}
   speedtest_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/ookla-speedtest.mrs"}
   tiktok_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs"}
-  gfw_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/gfw.mrs"}
   geolocation-!cn: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"}
   cn_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"}
   facebook_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/facebook.mrs"}
