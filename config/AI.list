@@ -48,3 +48,14 @@ DOMAIN,generativelanguage.googleapis.com
 DOMAIN,client-api.arkoselabs.com
 DOMAIN,makersuite.google.com
 DOMAIN,proactivebackend-pa.googleapis.com
+# Meta Muse 核心
+DOMAIN-SUFFIX,muse.ai
+DOMAIN,ai.meta.com
+DOMAIN,api.meta.ai
+DOMAIN,dev.meta.ai
+DOMAIN-SUFFIX,meta.ai
+  # Meta 账号与基础服务
+DOMAIN-SUFFIX,meta.com
+DOMAIN-SUFFIX,facebook.com
+DOMAIN-SUFFIX,fbcdn.net
+DOMAIN-SUFFIX,fbsbx.com
