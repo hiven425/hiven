@@ -59,3 +59,12 @@ payload:
   - DOMAIN-KEYWORD,googleapis
   - DOMAIN-KEYWORD,antigravity-unleash
   - DOMAIN-KEYWORD,antigravity-unleash.goog
+  - DOMAIN-SUFFIX,muse.ai
+  - DOMAIN,ai.meta.com
+  - DOMAIN,api.meta.ai
+  - DOMAIN,dev.meta.ai
+  - DOMAIN-SUFFIX,meta.ai
+  - DOMAIN-SUFFIX,meta.com
+  - DOMAIN-SUFFIX,facebook.com
+  - DOMAIN-SUFFIX,fbcdn.net
+  - DOMAIN-SUFFIX,fbsbx.com
