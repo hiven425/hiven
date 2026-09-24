@@ -1,0 +1,10 @@
+# Generated from config/Payment.list; run node config/qx-rules-sync.test.js --write after edits.
+# The policy placeholder is overridden by force-policy in qx/qx.conf.
+HOST-SUFFIX,stripe.com,HIVEN
+HOST-SUFFIX,stripe.network,HIVEN
+HOST-SUFFIX,stripeassets.com,HIVEN
+HOST-SUFFIX,wise.com,HIVEN
+HOST-SUFFIX,transferwise.com,HIVEN
+HOST-SUFFIX,payoneer.com,HIVEN
+HOST-SUFFIX,payoneerassets.com,HIVEN
+HOST-SUFFIX,worldfirst.com,HIVEN

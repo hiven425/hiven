@@ -1,0 +1,19 @@
+# Generated from config/Reject.list; run node config/qx-rules-sync.test.js --write after edits.
+# The policy placeholder is overridden by force-policy in qx/qx.conf.
+HOST-SUFFIX,ads.inmobi.com,HIVEN
+HOST-SUFFIX,tappx.com,HIVEN
+HOST-SUFFIX,criteo.com,HIVEN
+HOST-SUFFIX,pubmatic.com,HIVEN
+HOST-SUFFIX,smaato.net,HIVEN
+HOST-SUFFIX,amazon-adsystem.com,HIVEN
+HOST-KEYWORD,googleads,HIVEN
+HOST-SUFFIX,adsappier.com,HIVEN
+HOST-SUFFIX,appier.net,HIVEN
+HOST-SUFFIX,appiersig.com,HIVEN
+HOST-SUFFIX,ads.twitter.com,HIVEN
+HOST-SUFFIX,analytics.twitter.com,HIVEN
+HOST-SUFFIX,ads-api.twitter.com,HIVEN
+HOST-SUFFIX,p.twitter.com,HIVEN
+HOST-SUFFIX,googlesyndication.com,HIVEN
+HOST-SUFFIX,googleadservices.com,HIVEN
+HOST-SUFFIX,doubleclick.net,HIVEN

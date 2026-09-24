@@ -1,0 +1,20 @@
+# Cursor 官方服务、桌面进程与更新下载
+PROCESS-NAME,Cursor.exe
+PROCESS-NAME,CursorSetup.exe
+PROCESS-NAME,cursor-tunnel.exe
+PROCESS-NAME,cursor.cmd
+DOMAIN-SUFFIX,cursor.sh
+DOMAIN-SUFFIX,cursor.com
+DOMAIN-SUFFIX,cursor.so
+DOMAIN-SUFFIX,cursor.ai
+DOMAIN-SUFFIX,getcursor.com
+DOMAIN-SUFFIX,cursorapi.com
+DOMAIN-SUFFIX,cursor-cdn.com
+DOMAIN-SUFFIX,cursorvm.com
+DOMAIN,api2.cursor.sh
+DOMAIN,api3.cursor.sh
+DOMAIN,repo42.cursor.sh
+DOMAIN,downloads.cursor.com
+DOMAIN,anysphere-binaries.s3.us-east-1.amazonaws.com
+DOMAIN-SUFFIX,marketplace.cursorapi.com
+DOMAIN-SUFFIX,download.todesktop.com

@@ -1,0 +1,17 @@
+# Generated from config/Cursor.list; run node config/qx-rules-sync.test.js --write after edits.
+# The policy placeholder is overridden by force-policy in qx/qx.conf.
+HOST-SUFFIX,cursor.sh,HIVEN
+HOST-SUFFIX,cursor.com,HIVEN
+HOST-SUFFIX,cursor.so,HIVEN
+HOST-SUFFIX,cursor.ai,HIVEN
+HOST-SUFFIX,getcursor.com,HIVEN
+HOST-SUFFIX,cursorapi.com,HIVEN
+HOST-SUFFIX,cursor-cdn.com,HIVEN
+HOST-SUFFIX,cursorvm.com,HIVEN
+HOST,api2.cursor.sh,HIVEN
+HOST,api3.cursor.sh,HIVEN
+HOST,repo42.cursor.sh,HIVEN
+HOST,downloads.cursor.com,HIVEN
+HOST,anysphere-binaries.s3.us-east-1.amazonaws.com,HIVEN
+HOST-SUFFIX,marketplace.cursorapi.com,HIVEN
+HOST-SUFFIX,download.todesktop.com,HIVEN
