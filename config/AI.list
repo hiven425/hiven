@@ -40,7 +40,6 @@ DOMAIN-SUFFIX,x.ai
 DOMAIN-SUFFIX,trae.ai
 DOMAIN-SUFFIX,augmentcode.com
 DOMAIN-SUFFIX,marscode.com
-DOMAIN-SUFFIX,byteoversea.com
 #DOMAIN
 DOMAIN,ai.google.dev
 DOMAIN,alkalimakersuite-pa.clients6.google.com
@@ -48,14 +47,9 @@ DOMAIN,generativelanguage.googleapis.com
 DOMAIN,client-api.arkoselabs.com
 DOMAIN,makersuite.google.com
 DOMAIN,proactivebackend-pa.googleapis.com
-# Meta Muse 核心
+# Meta AI 仅保留专用域名；通用 Meta/Facebook/ByteDance 域名由对应服务规则处理。
 DOMAIN-SUFFIX,muse.ai
 DOMAIN,ai.meta.com
 DOMAIN,api.meta.ai
 DOMAIN,dev.meta.ai
 DOMAIN-SUFFIX,meta.ai
-  # Meta 账号与基础服务
-DOMAIN-SUFFIX,meta.com
-DOMAIN-SUFFIX,facebook.com
-DOMAIN-SUFFIX,fbcdn.net
-DOMAIN-SUFFIX,fbsbx.com

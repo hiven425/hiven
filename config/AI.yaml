@@ -59,12 +59,9 @@ payload:
   - DOMAIN-KEYWORD,googleapis
   - DOMAIN-KEYWORD,antigravity-unleash
   - DOMAIN-KEYWORD,antigravity-unleash.goog
+  # Meta AI 专用域名；通用 Meta/Facebook 域名由外贸规则处理
   - DOMAIN-SUFFIX,muse.ai
   - DOMAIN,ai.meta.com
   - DOMAIN,api.meta.ai
   - DOMAIN,dev.meta.ai
   - DOMAIN-SUFFIX,meta.ai
-  - DOMAIN-SUFFIX,meta.com
-  - DOMAIN-SUFFIX,facebook.com
-  - DOMAIN-SUFFIX,fbcdn.net
-  - DOMAIN-SUFFIX,fbsbx.com
