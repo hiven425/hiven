@@ -21,13 +21,55 @@ function assertAbsent(content, patterns, profile) {
   }
 }
 
+// Preserve every header in the official full profile, including empty sections.
+// Validate the native syntax subset used by this public profile, not arbitrary QX profiles.
+const qxSectionSyntax = new Map([
+  ['general', /^(?:server_check_url|server_check_timeout|network_check_url|excluded_routes|udp_whitelist|fallback_udp_policy)\s*=\s*\S.*$/],
+  ['dns', /^(?:no-ipv6|no-system|(?:doh-server|server)\s*=\s*\S.*)$/],
+  ['policy', /^(?:static|available|url-latency-benchmark)\s*=\s*[^,]+,\s*\S.*$/],
+  ['server_remote', null],
+  ['filter_remote', /^https:\/\/[^\s,]+, tag=[^,]+, force-policy=[^,]+, update-interval=\d+, opt-parser=false, enabled=(?:true|false)$/],
+  ['rewrite_remote', /^https:\/\/[^\s,]+, tag=[^,]+, update-interval=\d+, opt-parser=false, enabled=(?:true|false)$/],
+  ['server_local', null],
+  ['filter_local', /^(?:(?:host(?:-suffix)?|ip6?-cidr|geoip),\s*[^,]+,\s*[^,]+|final,\s*[^,]+)$/i],
+  ['rewrite_local', null],
+  ['task_local', null],
+  ['http_backend', null],
+  ['mitm', null],
+]);
+const qxSections = new Map();
+let qxSection;
+for (const line of qx.split('\n').map((value) => value.trim())) {
+  if (!line || /^(?:#|;|\/\/)/.test(line)) continue;
+  const header = line.match(/^\[([^\]]+)\]$/);
+  if (header) {
+    qxSection = header[1];
+    assert.ok(qxSectionSyntax.has(qxSection), `Quantumult X contains unknown section [${qxSection}]`);
+    assert.ok(!qxSections.has(qxSection), `Quantumult X contains duplicate section [${qxSection}]`);
+    qxSections.set(qxSection, []);
+  } else {
+    assert.ok(qxSection, 'Quantumult X contains an entry before its first section');
+    qxSections.get(qxSection).push(line);
+  }
+}
+for (const [section, syntax] of qxSectionSyntax) {
+  assert.ok(qxSections.has(section), `Quantumult X is missing section [${section}]`);
+  const entries = qxSections.get(section);
+  if (syntax) {
+    for (const line of entries) {
+      assert.match(line, syntax, `Quantumult X contains an invalid or misplaced entry in [${section}]: ${line}`);
+    }
+  } else {
+    assert.equal(entries.length, 0, `Public Quantumult X section [${section}] must remain empty`);
+  }
+}
+
 assertAbsent(
   qx,
   [
     /dns_exclusion_list/i,
     /resource_parser_url/i,
-    /^\[(?:rewrite(?:_local)?|mitm|task(?:_local)?|http_backend)\]/im,
-    /^(?:ca-p12|ca-passphrase)\s*=/im,
+    /^(?:ca-p12|ca-passphrase|p12|passphrase)\s*=/im,
     /skip_validating_cert/i,
     /img-url\s*=/i,
     /opt-parser\s*=\s*true/i
@@ -141,9 +183,7 @@ assert.equal(new Set(qxRemoteUrls).size, qxRemoteUrls.length, 'Quantumult X cont
 assert.equal(new Set(qxRemoteTags).size, qxRemoteTags.length, 'Quantumult X contains duplicate remote tags');
 
 // Optional rewrites may be listed, but public profiles must not activate HTTPS scripts or ship a CA.
-const qxRewriteSection = qx.match(/^\[rewrite_remote\]\n([\s\S]*?)(?=^\[|(?![\s\S]))/m)?.[1];
-assert.ok(qxRewriteSection, 'Quantumult X is missing optional rewrite resources');
-const qxRewriteLines = qxRewriteSection.split('\n').filter((line) => line.trim() && !line.startsWith('#'));
+const qxRewriteLines = qxSections.get('rewrite_remote');
 const expectedRewrites = ['YoutubeAds.conf', 'AmapAds.conf', 'CainiaoAds.conf', 'Applet.conf', 'BingSimplify.conf'];
 assert.deepEqual(qxRewriteLines.map((line) => line.split(',')[0].split('/').pop()).sort(), expectedRewrites.sort());
 for (const line of qxRewriteLines) {
