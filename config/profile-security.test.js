@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const net = require('node:net');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
@@ -25,7 +26,8 @@ assertAbsent(
   [
     /dns_exclusion_list/i,
     /resource_parser_url/i,
-    /^\[(?:rewrite|mitm|task|http_backend)\]/im,
+    /^\[(?:rewrite(?:_local)?|mitm|task(?:_local)?|http_backend)\]/im,
+    /^(?:ca-p12|ca-passphrase)\s*=/im,
     /skip_validating_cert/i,
     /img-url\s*=/i,
     /opt-parser\s*=\s*true/i,
@@ -41,19 +43,106 @@ assert.match(qx, /^final,\s*🐟 漏网之鱼$/m);
 assert.match(qx, /^static=💻 Cursor,/m);
 assert.match(qx, /\/qx\/rules\/Cursor\.list, tag=Cursor, force-policy=💻 Cursor/);
 
-const qxGroups = new Set([...qx.matchAll(/^(?:static|url-latency-benchmark)=([^,\n]+)/gm)].map((match) => match[1].trim()));
+const qxGroups = new Set([...qx.matchAll(/^(?:static|available|url-latency-benchmark)=([^,\n]+)/gm)].map((match) => match[1].trim()));
 const qxReferences = [
   ...qx.matchAll(/force-policy=([^,\n]+)/g),
-  ...qx.matchAll(/^(?:host(?:-suffix)?|ip-cidr|geoip|final),\s*[^,]+,\s*([^,\n]+)/gim)
+  ...qx.matchAll(/^(?:host(?:-suffix)?|ip6?-cidr|geoip),\s*[^,]+,\s*([^,\n]+)/gim),
+  ...qx.matchAll(/^final,\s*([^,\n]+)/gim)
 ].map((match) => match[1].trim());
 for (const policy of qxReferences) {
   assert.ok(qxGroups.has(policy) || /^(?:direct|reject)$/i.test(policy), `Quantumult X references missing policy: ${policy}`);
+}
+for (const match of qx.matchAll(/^static=([^\n]+)/gm)) {
+  for (const policy of match[1].split(',').slice(1).map((value) => value.trim())) {
+    assert.ok(qxGroups.has(policy) || /^(?:direct|reject)$/i.test(policy), `Quantumult X group references missing policy: ${policy}`);
+  }
+}
+
+// Use IP literals so resolving a DoH hostname cannot require plaintext bootstrap DNS.
+const qxDohServers = qx.match(/^doh-server\s*=\s*(.+)$/m)[1].split(',').map((value) => new URL(value.trim()));
+assert.ok(qxDohServers.length >= 2, 'Quantumult X needs multiple encrypted DNS endpoints');
+for (const endpoint of qxDohServers) {
+  assert.equal(endpoint.protocol, 'https:');
+  assert.equal(net.isIP(endpoint.hostname), 4, 'Quantumult X DoH bootstrap must use an IPv4 literal');
+}
+const privateDnsDomains = ['lan', '*.lan', 'local', '*.local', 'home.arpa', '*.home.arpa'];
+const qxDnsExceptions = [...qx.matchAll(/^server\s*=\s*(.+)$/gm)].map((match) => match[1].trim());
+assert.deepEqual(qxDnsExceptions.sort(), privateDnsDomains.map((domain) => `/${domain}/system`).sort());
+for (const domain of ['lan', 'local', 'home.arpa']) {
+  assert.match(qx, new RegExp(`^host-suffix, ${domain.replaceAll('.', '\\.')}, direct$`, 'm'));
+}
+const ipv6RejectIndex = qx.indexOf('ip6-cidr, ::/0, reject');
+assert.ok(ipv6RejectIndex >= 0 && ipv6RejectIndex < qx.indexOf('geoip, cn, direct'), 'Public IPv6 must fail closed before GEOIP/FINAL');
+for (const subnet of ['::1/128', 'fc00::/7', 'fe80::/10', 'ff00::/8']) {
+  assert.ok(qx.includes(`ip6-cidr, ${subnet}, direct`), `Missing local IPv6 route: ${subnet}`);
+}
+assert.ok(qx.indexOf('tag=YouTube,') < qx.indexOf('tag=Google,'), 'YouTube shared IP rules must precede Google');
+assert.match(qx, /^static=🚀 节点选择, 🏠 家宽节点, ♻️ 故障切换,/m);
+assert.match(qx, /^available=🏠 家宽节点,/m, 'Residential traffic should keep the first healthy exit instead of chasing latency');
+
+const qxNodeFilters = new Map([...qx.matchAll(/^(?:available|url-latency-benchmark)=([^,]+), server-tag-regex=(.+?)(?:, check-interval=\d+.*)?$/gm)]
+  // QX's ICU inline case flag becomes the equivalent JS flag for these fixtures.
+  .map((match) => [match[1], new RegExp(match[2].replaceAll('(?i)', ''), 'i')]));
+for (const [nodeName, group] of [
+  ['🇺🇸 美国 01', '🇺🇲 美国节点'],
+  ['US01 Network', '🇺🇲 美国节点'],
+  ['San Francisco 01', '🇺🇲 美国节点'],
+  ['🇯🇵 日本 01', '🇯🇵 日本节点'],
+  ['JP01 Network', '🇯🇵 日本节点'],
+  ['台湾 新北 01', '🇹🇼 台湾节点'],
+  ['Taipei 01', '🇹🇼 台湾节点'],
+  ['Singapore 01', '🇸🇬 新加坡节点'],
+  ['Hong Kong 01', '🇭🇰 香港节点'],
+  ['Australia 01', '🌍 其他节点'],
+  ['Austria 01', '🌍 其他节点'],
+  ['Russia 01', '🌍 其他节点'],
+  ['🇰🇷 韩国 01', '🌍 其他节点'],
+  ['南美 智利 01', '🌍 其他节点'],
+  ['美国家宽 1.6x', '🏠 家宽节点'],
+  ['美国家宽 5.99x', '🏠 家宽节点'],
+]) {
+  assert.ok(qxNodeFilters.get(group).test(nodeName), `${nodeName} must be selectable in ${group}`);
+  if (group !== '🌍 其他节点') {
+    assert.ok(!qxNodeFilters.get('🌍 其他节点').test(nodeName), `${nodeName} must not also enter the other-region group`);
+  }
+}
+for (const nodeName of ['Australia 01', 'Austria 01', 'Russia 01', '南美 智利 01']) {
+  assert.ok(!qxNodeFilters.get('🇺🇲 美国节点').test(nodeName), `${nodeName} must not be mistaken for a US node`);
+}
+for (const nodeName of ['🇺🇸 美国 6x', '日本 倍率 16.5', '台湾 已过期', '官网 流量剩余', '香港 专线']) {
+  for (const [group, filter] of qxNodeFilters) {
+    assert.ok(!filter.test(nodeName), `${group} must exclude metadata and expensive nodes: ${nodeName}`);
+  }
+}
+assert.ok(qxNodeFilters.get('♻️ 故障切换').test('🇺🇸 美国 1.6x'));
+assert.ok(!qxNodeFilters.get('♻️ 故障切换').test('美国家宽 01'), 'General failover must not consume residential quota');
+const qxBenchmarks = [...qx.matchAll(/^url-latency-benchmark=.+, check-interval=(\d+), alive-checking=(\w+), tolerance=(\d+)$/gm)];
+assert.equal(qxBenchmarks.length, 6, 'All six country/other groups need explicit benchmark settings');
+for (const match of qxBenchmarks) {
+  assert.ok(Number(match[1]) > 0 && Number(match[1]) <= 300, 'Active country groups should refresh within five minutes');
+  assert.equal(match[2], 'false', 'Idle country groups should not keep probing on mobile');
+  assert.ok(Number(match[3]) > 0, 'Latency tolerance should prevent needless exit changes');
 }
 const qxRemoteLines = qx.match(/^https:\/\/.*$/gm) || [];
 const qxRemoteUrls = qxRemoteLines.map((line) => line.split(',')[0]);
 const qxRemoteTags = qxRemoteLines.map((line) => line.match(/\btag=([^,]+)/)?.[1]);
 assert.equal(new Set(qxRemoteUrls).size, qxRemoteUrls.length, 'Quantumult X contains duplicate remote resources');
 assert.equal(new Set(qxRemoteTags).size, qxRemoteTags.length, 'Quantumult X contains duplicate remote tags');
+
+// Optional rewrites may be listed, but public profiles must not activate HTTPS scripts or ship a CA.
+const qxRewriteSection = qx.match(/^\[rewrite_remote\]\n([\s\S]*?)(?=^\[|(?![\s\S]))/m)?.[1];
+assert.ok(qxRewriteSection, 'Quantumult X is missing optional rewrite resources');
+const qxRewriteLines = qxRewriteSection.split('\n').filter((line) => line.trim() && !line.startsWith('#'));
+const expectedRewrites = ['YoutubeAds.conf', 'AmapAds.conf', 'CainiaoAds.conf', 'Applet.conf', 'BingSimplify.conf'];
+assert.deepEqual(qxRewriteLines.map((line) => line.split(',')[0].split('/').pop()).sort(), expectedRewrites.sort());
+for (const line of qxRewriteLines) {
+  const url = new URL(line.split(',')[0]);
+  assert.equal(url.origin, 'https://raw.githubusercontent.com');
+  assert.ok(url.pathname.startsWith('/ddgksf2013/Rewrite/refs/heads/master/AdBlock/'), 'Rewrite must use the selected upstream source');
+  assert.match(line, /, enabled=false$/, 'Optional rewrites must stay disabled until configured on the device');
+  assert.match(line, /, opt-parser=false,/, 'Native rewrites must not depend on a resource parser');
+  assert.doesNotMatch(line, /force-policy=/, 'Rewrite resources must not replace service routing policies');
+}
 
 assertAbsent(
   shadowrocket,
