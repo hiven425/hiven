@@ -30,8 +30,7 @@ assertAbsent(
     /^(?:ca-p12|ca-passphrase)\s*=/im,
     /skip_validating_cert/i,
     /img-url\s*=/i,
-    /opt-parser\s*=\s*true/i,
-    /http:\/\//i
+    /opt-parser\s*=\s*true/i
   ],
   'Quantumult X'
 );
@@ -42,6 +41,18 @@ assert.match(qx, /^fallback_udp_policy\s*=\s*reject$/m);
 assert.match(qx, /^final,\s*🐟 漏网之鱼$/m);
 assert.match(qx, /^static=💻 Cursor,/m);
 assert.match(qx, /\/qx\/rules\/Cursor\.list, tag=Cursor, force-policy=💻 Cursor/);
+
+// QX's probe URL parser rejects HTTPS; encrypted DNS and remote resources still require HTTPS.
+for (const setting of ['server_check_url', 'network_check_url']) {
+  const address = qx.match(new RegExp(`^${setting}\\s*=\\s*(\\S+)\\s*$`, 'm'))?.[1];
+  assert.ok(address, `Quantumult X is missing ${setting}`);
+  assert.equal(new URL(address).protocol, 'http:', `${setting} must use a QX-compatible HTTP probe`);
+}
+for (const line of qx.split('\n').map((value) => value.trim()).filter((value) => !/^(?:#|;|\/\/)/.test(value))) {
+  if (/http:\/\//i.test(line)) {
+    assert.match(line, /^(?:server_check_url|network_check_url)\s*=\s*http:\/\/\S+$/, 'Only QX probe settings may use HTTP');
+  }
+}
 
 const qxGroups = new Set([...qx.matchAll(/^(?:static|available|url-latency-benchmark)=([^,\n]+)/gm)].map((match) => match[1].trim()));
 const qxReferences = [
