@@ -7,6 +7,8 @@
 # DNS 复用下方 MRS 规则集，避免额外加载完整 GeoSite/GeoIP 数据。
 
 mode: rule
+# 日常减少日志开销；排查 DNS 或分流问题时可临时改为 info。
+log-level: warning
 ipv6: true
 allow-lan: false
 unified-delay: true
@@ -145,6 +147,9 @@ proxy-groups:
     <<: *OfficeProxies
   - name: 🐬 外贸
     <<: *USProxies
+  - name: 🗽 x
+    type: select
+    proxies: [🗽 X 自动, 🇭🇰 香港节点, 🇯🇵 日本节点, 🇸🇬 新加坡节点, 🇹🇼 台湾节点, 🇺🇲 美国节点, 🌍 其他节点, 🏚️ 家宽节点, 🚀 节点选择]
   - name: 🎵 TikTok
     <<: *GlobalProxies
   - name: 📲 Telegram
@@ -191,6 +196,22 @@ proxy-groups:
     # 只保留同时带有家宽和美国标识的节点。
     filter: '^(?=.*(?i)(?:家宽))(?=.*(?i)(?:美国|🇺🇸|(?:^|[^A-Za-z])(?:US|USA)(?:[^A-Za-z]|$)|United States|American|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|New York|Miami|Boston|San Francisco))(?!.*(?i)(?:亚洲|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
 
+  # 与 Shadowrocket 一致，直接检测普通节点访问 X 的能力，不嵌套 Google 测速组。
+  - name: 🗽 X 自动
+    type: url-test
+    include-all: true
+    exclude-type: direct
+    # 排除家宽、订阅提示及 >=6 倍节点；数字边界避免把 1.6x / 5.99x 误判为高倍率。
+    filter: '(?i)^(?!.*(?:家宽|专线|到期|过期|剩余|流量|时间|官网|产品|重新|重置|🪒 直连|总计|统计|建议|国内|海外|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:^|[^\d.])(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
+    url: 'https://x.com/favicon.ico'
+    expected-status: '200'
+    interval: 600
+    # Mihomo 的 timeout 单位为毫秒，Shadowrocket 的 timeout 单位为秒。
+    timeout: 8000
+    tolerance: 100
+    lazy: true
+    max-failed-times: 3
+
   - name: ♻️ 自动选择
     type: url-test
     proxies: [🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
@@ -213,6 +234,11 @@ rules:
   - RULE-SET,private_domain,DIRECT
   - RULE-SET,my_direct,DIRECT
   - RULE-SET,apple_domain,🍎 Apple
+  # X 核心域名本地兜底，远程规则更新异常时仍使用独立 X 策略。
+  - DOMAIN-SUFFIX,x.com,🗽 x
+  - DOMAIN-SUFFIX,twitter.com,🗽 x
+  - DOMAIN-SUFFIX,twimg.com,🗽 x
+  - DOMAIN-SUFFIX,t.co,🗽 x
   - RULE-SET,my_proxylite,🚀 节点选择
   - RULE-SET,my_cursor,💻 Cursor
   - RULE-SET,my_ai,🏹 ChatGPT
@@ -225,7 +251,7 @@ rules:
   - RULE-SET,whatsapp_domain,🐬 外贸
   - RULE-SET,instagram_domain,🐬 外贸
   - RULE-SET,linkedin_domain,🐬 外贸
-  - RULE-SET,x_domain,🐬 外贸
+  - RULE-SET,x_domain,🗽 x
   - RULE-SET,google_domain,🍀 Google
   - RULE-SET,google_gemini_domain,🍀 Google
   - RULE-SET,onedrive_domain,🍒 microsoft

@@ -67,9 +67,46 @@ for (const [file, profile] of mihomoProfiles) {
     assert.doesNotMatch(entries, /^    -\s+(?!https:\/\/)/m, `${file} ${resolver} must use DoH`);
   }
 
+  const groupSection = profile.match(/^proxy-groups:\n([\s\S]*?)(?=^\S)/m)?.[1];
+  assert.ok(groupSection, `${file} is missing proxy groups`);
+  const groups = new Map(groupSection.split(/^  - name: /m).slice(1).map((block) => {
+    const newline = block.indexOf('\n');
+    return [block.slice(0, newline), block.slice(newline + 1)];
+  }));
+  const xPolicy = groups.get('🗽 x');
+  assert.ok(xPolicy, 'iOS X policy is missing');
+  assert.match(xPolicy, /^    type: select$/m);
+  const xChoices = xPolicy.match(/^    proxies: \[([^\]]+)\]$/m)?.[1].split(',').map((choice) => choice.trim());
+  assert.equal(xChoices?.[0], '🗽 X 自动', 'iOS X should default to its own health check');
+  assert.ok(!xChoices.includes('DIRECT'), 'iOS X must not offer accidental direct routing');
+
+  const xAuto = groups.get('🗽 X 自动');
+  assert.ok(xAuto, 'iOS X automatic group is missing');
+  for (const field of ['type: url-test', 'include-all: true', 'exclude-type: direct', 'interval: 600', 'timeout: 8000', 'tolerance: 100', 'lazy: true', 'max-failed-times: 3']) {
+    assert.ok(xAuto.split('\n').includes(`    ${field}`), `iOS X automatic group is missing ${field}`);
+  }
+  assert.match(xAuto, /^    url: ['"]?https:\/\/x\.com\/favicon\.ico['"]?$/m);
+  assert.match(xAuto, /^    expected-status: ['"]200['"]$/m);
+  const xNodePattern = xAuto.match(/^    filter: '(.+)'$/m)?.[1];
+  assert.ok(xNodePattern, 'iOS X must filter injected nodes directly');
+  // Mihomo's inline case flag becomes the equivalent JS flag for these fixtures.
+  const xNodeFilter = new RegExp(xNodePattern.replaceAll('(?i)', ''), 'i');
+  for (const nodeName of ['香港 01', '日本 1.6x', '美国 5.99x']) {
+    assert.ok(xNodeFilter.test(nodeName), `${nodeName} must be available in iOS X automatic selection`);
+  }
+  for (const nodeName of ['香港 家宽 01', '日本 专线', '官网 剩余流量', '香港 6x', '美国 16.5x', '日本 倍率 6']) {
+    assert.ok(!xNodeFilter.test(nodeName), `${nodeName} must not enter iOS X automatic selection`);
+  }
+
   const ruleSection = profile.match(/^rules:\n([\s\S]*?)(?=^\S)/m)?.[1];
   assert.ok(ruleSection, `${file} is missing routing rules`);
   const rules = [...ruleSection.matchAll(/^  - (.+)$/gm)].map((match) => match[1]);
+  for (const domain of ['x.com', 'twitter.com', 'twimg.com', 't.co']) {
+    const rule = `DOMAIN-SUFFIX,${domain},🗽 x`;
+    assert.ok(rules.includes(rule), `iOS X is missing explicit routing for ${domain}`);
+    assert.ok(rules.indexOf(rule) < rules.indexOf('RULE-SET,my_proxylite,🚀 节点选择'), `${domain} must reach the X group before shared proxy rules`);
+  }
+  assert.deepEqual(rules.filter((rule) => rule.startsWith('RULE-SET,x_domain,')), ['RULE-SET,x_domain,🗽 x']);
   for (const [first, second] of [
     ['RULE-SET,youtube_domain,📹 YouTube', 'RULE-SET,google_domain,🍀 Google'],
     ['RULE-SET,microsoft_download,📦 微软大流量', 'RULE-SET,microsoft_direct,DIRECT'],
