@@ -5,10 +5,9 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8').replace(/\r\n/g, '\n');
-const qx = read('qx/qx.conf');
-const shadowrocket = read('Shadowrocket/Shadowrocket.conf');
 const mihomoProfiles = [
   'clash/mihomo.sparkle.yaml',
+  'clash/clash.ios.yaml',
   'clash/mihomo.sublinkpro.yaml',
   'clash/mihomo.android.yaml',
   'clash/mihomo.nikki.yaml',
@@ -20,6 +19,80 @@ function assertAbsent(content, patterns, profile) {
     assert.doesNotMatch(content, pattern, `${profile} contains forbidden ${pattern}`);
   }
 }
+
+for (const [file, profile] of mihomoProfiles) {
+  const bootstrap = profile.match(/^  default-nameserver:\n((?:    .*\n)+)/m);
+  assert.ok(bootstrap, `${file} is missing default-nameserver`);
+  assert.doesNotMatch(bootstrap[1], /^    -\s+(?!https:\/\/)/m, `${file} has a non-DoH bootstrap resolver`);
+  assert.match(profile, /^\s+direct-nameserver-follow-policy:\s+true$/m);
+  assert.match(profile, /^\s+- IP-CIDR6,fc00::\/7,DIRECT,no-resolve$/m);
+  assert.match(profile, /^\s+- IP-CIDR6,fe80::\/10,DIRECT,no-resolve$/m);
+  assert.match(profile, /^  - name: 💻 Cursor$/m);
+  assert.match(profile, /^  - RULE-SET,my_cursor,💻 Cursor$/m);
+  assert.match(profile, /^  my_cursor:/m);
+  assertAbsent(profile, [/^\s+gfw_domain:\s*$/m, /🛑 广告/], file);
+
+  const providerSection = profile.match(/^rule-providers:\n([\s\S]*)$/m)?.[1];
+  assert.ok(providerSection, `${file} is missing rule-providers`);
+  const providers = new Set([...providerSection.matchAll(/^  ([^\s:#][^:]*):/gm)].map((match) => match[1]));
+  const usedProviders = new Set([...profile.matchAll(/RULE-SET,([^,\n]+)/g)].map((match) => match[1]));
+  assert.deepEqual([...providers].sort(), [...usedProviders].sort(), `${file} has missing or unused rule providers`);
+
+  if (file !== 'clash/clash.ios.yaml') continue;
+  assertAbsent(profile, [
+    /^(?:tun|port|(?:mixed|socks|redir|tproxy)-port|external-controller(?:-tls|-unix|-pipe)?|external-ui(?:-url|-name)?|geo-auto-update|geo-update-interval|geox-url):/m,
+    /^  - PROCESS-/m,
+    /geosite:/,
+  ], file);
+  assert.match(profile, /^mode: rule$/m);
+  assert.match(profile, /^ipv6: true$/m);
+  assert.match(profile, /^find-process-mode: ['"]?off['"]?$/m);
+
+  const dns = profile.match(/^dns:\n([\s\S]*?)(?=^\S)/m)?.[1];
+  assert.ok(dns, `${file} is missing DNS settings`);
+  assert.doesNotMatch(dns, /^  listen:/m, 'Clash-Client must own the iOS DNS listener');
+  assert.match(dns, /^  ipv6: true$/m);
+  assert.match(dns, /^  enhanced-mode: fake-ip$/m);
+  assert.match(dns, /^  fake-ip-range: 198\.18\.0\.0\/15$/m);
+  assert.match(dns, /^  fake-ip-range6: fdfe:dcba:9876::1\/64$/m);
+  assert.match(dns, /^  respect-rules: true$/m);
+  for (const provider of ['private_domain', 'cn_domain']) {
+    assert.match(dns, new RegExp(`^    - ['"]?rule-set:${provider}['"]?$`, 'm'), `${file} Fake-IP filtering must reuse ${provider}`);
+  }
+  assert.match(dns, /^    ['"]?rule-set:private_domain,cn_domain['"]?:$/m);
+  assert.match(dns, /^    ['"]?rule-set:geolocation-!cn['"]?:$/m);
+  for (const resolver of ['default-nameserver', 'proxy-server-nameserver', 'nameserver', 'direct-nameserver']) {
+    const entries = dns.match(new RegExp(`^  ${resolver}:\\n((?:    .*\\n)+)`, 'm'))?.[1];
+    assert.ok(entries, `${file} is missing ${resolver}`);
+    assert.doesNotMatch(entries, /^    -\s+(?!https:\/\/)/m, `${file} ${resolver} must use DoH`);
+  }
+
+  const ruleSection = profile.match(/^rules:\n([\s\S]*?)(?=^\S)/m)?.[1];
+  assert.ok(ruleSection, `${file} is missing routing rules`);
+  const rules = [...ruleSection.matchAll(/^  - (.+)$/gm)].map((match) => match[1]);
+  for (const [first, second] of [
+    ['RULE-SET,youtube_domain,📹 YouTube', 'RULE-SET,google_domain,🍀 Google'],
+    ['RULE-SET,microsoft_download,📦 微软大流量', 'RULE-SET,microsoft_direct,DIRECT'],
+    ['RULE-SET,microsoft_direct,DIRECT', 'RULE-SET,microsoft_proxy,🍒 microsoft'],
+    ['RULE-SET,microsoft_proxy,🍒 microsoft', 'RULE-SET,microsoft_domain,🍒 microsoft'],
+    ['RULE-SET,facebook_ip,🐬 外贸,no-resolve', 'RULE-SET,cn_ip,🎯 全球直连'],
+    ['RULE-SET,telegram_ip,📲 Telegram,no-resolve', 'RULE-SET,cn_ip,🎯 全球直连'],
+    ['RULE-SET,cn_ip,🎯 全球直连', 'MATCH,🐟 漏网之鱼'],
+  ]) {
+    assert.ok(rules.includes(first) && rules.includes(second), `${file} is missing routing rules: ${first} / ${second}`);
+    assert.ok(rules.indexOf(first) < rules.indexOf(second), `${file} must route ${first} before ${second}`);
+  }
+  assert.equal(rules.at(-1), 'MATCH,🐟 漏网之鱼', 'iOS unmatched traffic must use the proxy catch-all');
+}
+
+if (process.argv.includes('--mihomo-only')) {
+  assert.doesNotMatch(mihomoProfiles.map(([, profile]) => profile).join('\n'), /raw\.githubusercontent\.com\/hiven425\/hiven\/(?:master|main)\//);
+  console.log('profile security: all Mihomo DNS, routing, and public-profile assertions passed');
+  process.exit(0);
+}
+
+const qx = read('qx/qx.conf');
+const shadowrocket = read('Shadowrocket/Shadowrocket.conf');
 
 // Preserve every header in the official full profile, including empty sections.
 // Validate the native syntax subset used by this public profile, not arbitrary QX profiles.
@@ -246,25 +319,6 @@ for (const line of shadowRules.split('\n').filter((entry) => entry && !entry.sta
       `Shadowrocket references missing policy: ${policy}`
     );
   }
-}
-
-for (const [file, profile] of mihomoProfiles) {
-  const bootstrap = profile.match(/^  default-nameserver:\n((?:    .*\n)+)/m);
-  assert.ok(bootstrap, `${file} is missing default-nameserver`);
-  assert.doesNotMatch(bootstrap[1], /^    -\s+(?!https:\/\/)/m, `${file} has a non-DoH bootstrap resolver`);
-  assert.match(profile, /^\s+direct-nameserver-follow-policy:\s+true$/m);
-  assert.match(profile, /^\s+- IP-CIDR6,fc00::\/7,DIRECT,no-resolve$/m);
-  assert.match(profile, /^\s+- IP-CIDR6,fe80::\/10,DIRECT,no-resolve$/m);
-  assert.match(profile, /^  - name: 💻 Cursor$/m);
-  assert.match(profile, /^  - RULE-SET,my_cursor,💻 Cursor$/m);
-  assert.match(profile, /^  my_cursor:/m);
-  assertAbsent(profile, [/^\s+gfw_domain:\s*$/m, /🛑 广告/], file);
-
-  const providerSection = profile.match(/^rule-providers:\n([\s\S]*)$/m)?.[1];
-  assert.ok(providerSection, `${file} is missing rule-providers`);
-  const providers = new Set([...providerSection.matchAll(/^  ([^\s:#][^:]*):/gm)].map((match) => match[1]));
-  const usedProviders = new Set([...profile.matchAll(/RULE-SET,([^,\n]+)/g)].map((match) => match[1]));
-  assert.deepEqual([...providers].sort(), [...usedProviders].sort(), `${file} has missing or unused rule providers`);
 }
 
 const publicProfiles = [qx, shadowrocket, ...mihomoProfiles.map(([, profile]) => profile)].join('\n');
