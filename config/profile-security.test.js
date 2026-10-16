@@ -320,24 +320,43 @@ assert.match(shadowrocket, /^💻 Cursor = select,/m);
 
 const shadowSection = shadowrocket.match(/\[Proxy Group\]\n([\s\S]*?)\n\[Rule\]/)?.[1];
 assert.ok(shadowSection, 'Shadowrocket is missing Proxy Group or Rule sections');
-const xPolicy = shadowSection.match(/^🗽 x = select,([^\n]+)/m)?.[1].split(',');
-assert.equal(xPolicy?.[0], '🇭🇰 X 香港', 'X should default to failover within Hong Kong');
-assert.ok(!xPolicy.includes('🇭🇰 香港自动'), 'X must not use the Google-only Hong Kong health check');
-const xHongKong = shadowSection.match(/^🇭🇰 X 香港 = ([^\n]+)/m)?.[1];
-assert.ok(xHongKong, 'X Hong Kong policy is missing');
-const [xHealthCheck, xNodePattern] = xHongKong.split(',policy-regex-filter=');
-assert.equal(xHealthCheck.split(',')[0], 'fallback');
-assert.match(xHealthCheck, /(?:^|,)url=https:\/\/x\.com\//, 'X health must be checked against X');
-const xInterval = Number(xHealthCheck.match(/(?:^|,)interval=(\d+)(?:,|$)/)?.[1]);
-assert.ok(xInterval > 0 && xInterval <= 60, 'X health should refresh within one minute');
-assert.ok(xNodePattern, 'X Hong Kong must select nodes directly without nesting country groups');
-// Shadowrocket's ICU case flags become the equivalent JS flag for these node fixtures.
-const xHongKongFilter = new RegExp(xNodePattern.replaceAll('(?i)', ''), 'i');
-for (const nodeName of ['🇭🇰 香港 01', 'Hong Kong 02', 'HK 03', '香港 1.6x', '香港 5.99x']) {
-  assert.ok(xHongKongFilter.test(nodeName), `${nodeName} must be available for X Hong Kong failover`);
+assert.match(shadowSection, /^🚀 节点选择 = select,♻️ 自动选择,/m, 'The main policy should default to automatic selection');
+const residentialAuto = shadowSection.match(/^🏠 家宽节点 = ([^\n]+)/m)?.[1];
+assert.ok(residentialAuto, 'Shadowrocket residential automatic policy is missing');
+const [residentialHealthCheck, residentialPattern] = residentialAuto.split(',policy-regex-filter=');
+assert.equal(residentialHealthCheck.split(',')[0], 'url-test');
+assert.match(residentialHealthCheck, /(?:^|,)url=https:\/\/www\.gstatic\.com\/generate_204(?:,|$)/);
+assert.match(residentialHealthCheck, /(?:^|,)interval=300(?:,|$)/);
+assert.match(residentialHealthCheck, /(?:^|,)timeout=5(?:,|$)/);
+assert.match(residentialHealthCheck, /(?:^|,)tolerance=0(?:,|$)/, 'Residential selection should choose the lowest measured latency without tolerance');
+assert.ok(residentialPattern, 'Residential automatic selection must filter nodes directly');
+const residentialFilter = new RegExp(residentialPattern.replaceAll('(?i)', ''), 'i');
+for (const nodeName of ['美国家宽 01', 'US 家宽 02', '美国家宽 1.6x', '美国家宽 5.99x']) {
+  assert.ok(residentialFilter.test(nodeName), `${nodeName} must be available for residential automatic selection`);
 }
-for (const nodeName of ['日本 01', '新加坡 02', 'US 03', '香港 家宽 01', '香港 专线', '香港 6x', '香港 16.5x', '香港 已过期', '香港 剩余流量']) {
-  assert.ok(!xHongKongFilter.test(nodeName), `${nodeName} must not enter X Hong Kong failover`);
+for (const nodeName of ['美国 01', '香港 家宽 01', '美国家宽 专线', '美国家宽 6x', '美国家宽 16.5x', '美国家宽 倍率 6', '美国家宽 已过期']) {
+  assert.ok(!residentialFilter.test(nodeName), `${nodeName} must not enter residential automatic selection`);
+}
+const xPolicy = shadowSection.match(/^🗽 x = select,([^\n]+)/m)?.[1].split(',');
+assert.equal(xPolicy?.[0], '🗽 X 自动', 'X should default to its own automatic selection');
+assert.ok(!xPolicy.includes('DIRECT'), 'X must not offer accidental direct routing');
+const xAuto = shadowSection.match(/^🗽 X 自动 = ([^\n]+)/m)?.[1];
+assert.ok(xAuto, 'Shadowrocket X automatic policy is missing');
+const [xHealthCheck, xNodePattern] = xAuto.split(',policy-regex-filter=');
+assert.equal(xHealthCheck.split(',')[0], 'url-test');
+assert.match(xHealthCheck, /(?:^|,)url=https:\/\/x\.com\/favicon\.ico(?:,|$)/, 'X health must be checked against X');
+const xInterval = Number(xHealthCheck.match(/(?:^|,)interval=(\d+)(?:,|$)/)?.[1]);
+assert.ok(xInterval > 0 && xInterval <= 600, 'X health should refresh within ten minutes');
+assert.match(xHealthCheck, /(?:^|,)timeout=8(?:,|$)/, 'Shadowrocket X timeout uses seconds');
+assert.match(xHealthCheck, /(?:^|,)select=0(?:,|$)/, 'Shadowrocket X should initially select its first candidate');
+assert.ok(xNodePattern, 'X automatic selection must filter nodes directly without nesting country groups');
+// Shadowrocket's ICU case flags become the equivalent JS flag for these node fixtures.
+const xNodeFilter = new RegExp(xNodePattern.replaceAll('(?i)', ''), 'i');
+for (const nodeName of ['🇭🇰 香港 01', 'Hong Kong 02', '日本 01', '新加坡 02', 'US 03', '台湾 04', '香港 1.6x', '香港 5.99x']) {
+  assert.ok(xNodeFilter.test(nodeName), `${nodeName} must be available for Shadowrocket X automatic selection`);
+}
+for (const nodeName of ['香港 家宽 01', '美国家宽 02', '香港 专线', '香港 6x', '香港 16.5x', '日本 倍率 6', '香港 已过期', '官网 剩余流量']) {
+  assert.ok(!xNodeFilter.test(nodeName), `${nodeName} must not enter Shadowrocket X automatic selection`);
 }
 const shadowGroups = new Set(
   shadowSection
