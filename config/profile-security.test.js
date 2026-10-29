@@ -7,6 +7,7 @@ const root = path.resolve(__dirname, '..');
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8').replace(/\r\n/g, '\n');
 const mihomoProfiles = [
   'clash/mihomo.sparkle.yaml',
+  'clash/mihomo.verge.yaml',
   'clash/clash.ios.yaml',
   'clash/mihomo.sublinkpro.yaml',
   'clash/mihomo.android.yaml',
@@ -23,7 +24,7 @@ function assertAbsent(content, patterns, profile) {
 for (const [file, profile] of mihomoProfiles) {
   const bootstrap = profile.match(/^  default-nameserver:\n((?:    .*\n)+)/m);
   assert.ok(bootstrap, `${file} is missing default-nameserver`);
-  assert.doesNotMatch(bootstrap[1], /^    -\s+(?!https:\/\/)/m, `${file} has a non-DoH bootstrap resolver`);
+  assert.doesNotMatch(bootstrap[1], /^    -\s+(?!['"]?https:\/\/)/m, `${file} has a non-DoH bootstrap resolver`);
   assert.match(profile, /^\s+direct-nameserver-follow-policy:\s+true$/m);
   assert.match(profile, /^\s+- IP-CIDR6,fc00::\/7,DIRECT,no-resolve$/m);
   assert.match(profile, /^\s+- IP-CIDR6,fe80::\/10,DIRECT,no-resolve$/m);
@@ -121,6 +122,49 @@ for (const [file, profile] of mihomoProfiles) {
   }
   assert.equal(rules.at(-1), 'MATCH,🐟 漏网之鱼', 'iOS unmatched traffic must use the proxy catch-all');
 }
+
+// Verge extensions retain subscription nodes and must override inherited DNS leakage paths.
+const verge = read('clash/mihomo.verge.yaml');
+assertAbsent(verge, [
+  /^(?:proxies|proxy-providers|port|socks-port|mixed-port|external-controller|secret|external-ui|mode|ipv6|allow-lan|unified-delay):/m,
+  /https:\/\/(?:192\.0\.2\.|198\.51\.100\.|203\.0\.113\.)/,
+  /geosite:/,
+], 'Clash Verge');
+const vergeTun = verge.match(/^tun:\n([\s\S]*?)(?=^\S)/m)?.[1];
+assert.ok(vergeTun, 'Verge is missing TUN settings');
+assert.doesNotMatch(vergeTun, /^  enable:/m, 'Verge must own the TUN switch');
+assert.match(vergeTun, /^  strict-route: true$/m);
+assert.match(vergeTun, /^  auto-route: true$/m);
+assert.match(vergeTun, /^    - 'any:53'$/m);
+assert.match(vergeTun, /^    - 'tcp:\/\/any:53'$/m);
+const vergeDns = verge.match(/^dns:\n([\s\S]*?)(?=^\S)/m)?.[1];
+assert.match(vergeDns, /^  respect-rules: true$/m);
+assert.match(vergeDns, /^  prefer-h3: false$/m);
+for (const [field, value] of [['fallback', '[]'], ['fallback-filter', '{}'], ['proxy-server-nameserver-policy', '{}']]) {
+  assert.ok(vergeDns.split('\n').includes(`  ${field}: ${value}`), `Verge must clear inherited ${field}`);
+}
+for (const resolver of ['nameserver', 'default-nameserver', 'proxy-server-nameserver', 'direct-nameserver']) {
+  const entries = vergeDns.match(new RegExp(`^  ${resolver}:\\n((?:    .*\\n)+)`, 'm'))?.[1];
+  assert.ok(entries, `Verge is missing ${resolver}`);
+  const expectedExit = resolver === 'nameserver' ? '#🚀 节点选择' : '#DIRECT';
+  for (const line of entries.split('\n').filter((line) => /^    - /.test(line))) {
+    assert.ok(line.trim().startsWith("- 'https://") && line.endsWith(`${expectedExit}'`), `${resolver} has an unpinned or unencrypted resolver: ${line}`);
+  }
+}
+const vergeRules = [...verge.matchAll(/^  - (.+)$/gm)].map((match) => match[1]);
+for (const domain of ['dns.google', 'cloudflare-dns.com', 'dns.quad9.net', 'dot.sb', 'dns.sb', 'dns.umbrella.com', 'doh.opendns.com']) {
+  const resolverRule = `DOMAIN-SUFFIX,${domain},🚀 节点选择`;
+  assert.ok(vergeRules.includes(resolverRule), `Missing foreign resolver routing: ${domain}`);
+  assert.ok(vergeRules.indexOf(resolverRule) < vergeRules.indexOf('RULE-SET,my_direct,DIRECT'), `${domain} must not match shared direct rules first`);
+}
+for (const country of ['🇬🇧 英国', '🇨🇦 加拿大', '🇩🇪 德国', '🇫🇷 法国', '🇳🇱 荷兰', '🇦🇺 澳大利亚', '🇰🇷 韩国']) {
+  const block = verge.split(`  - name: ${country} ChatGPT\n`)[1]?.split(/\n  - name: /)[0];
+  assert.ok(block, `Missing ChatGPT country: ${country}`);
+  assert.match(block, /^    type: url-test$/m);
+  assert.match(block, /^    tolerance: 0$/m);
+  assert.match(block, /^    <<: \*url_test_template$/m);
+}
+assert.match(verge, /^    empty-fallback: REJECT$/m, 'Empty proxy groups must fail closed');
 
 if (process.argv.includes('--mihomo-only')) {
   assert.doesNotMatch(mihomoProfiles.map(([, profile]) => profile).join('\n'), /raw\.githubusercontent\.com\/hiven425\/hiven\/(?:master|main)\//);
