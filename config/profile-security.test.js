@@ -28,8 +28,10 @@ for (const [file, profile] of mihomoProfiles) {
   assert.match(profile, /^\s+direct-nameserver-follow-policy:\s+true$/m);
   assert.match(profile, /^\s+- IP-CIDR6,fc00::\/7,DIRECT,no-resolve$/m);
   assert.match(profile, /^\s+- IP-CIDR6,fe80::\/10,DIRECT,no-resolve$/m);
-  assert.match(profile, /^  - name: 💻 Cursor$/m);
-  assert.match(profile, /^  - RULE-SET,my_cursor,💻 Cursor$/m);
+  if (file !== 'clash/mihomo.sparkle.yaml') {
+    assert.match(profile, /^  - name: 💻 Cursor$/m);
+    assert.match(profile, /^  - RULE-SET,my_cursor,💻 Cursor$/m);
+  }
   assert.match(profile, /^  my_cursor:/m);
   assertAbsent(profile, [/^\s+gfw_domain:\s*$/m, /🛑 广告/], file);
 
@@ -165,6 +167,127 @@ for (const country of ['🇬🇧 英国', '🇨🇦 加拿大', '🇩🇪 德国
   assert.match(block, /^    <<: \*url_test_template$/m);
 }
 assert.match(verge, /^    empty-fallback: REJECT$/m, 'Empty proxy groups must fail closed');
+
+const sparkle = read('clash/mihomo.sparkle.yaml');
+const sparkleGroupsSection = sparkle.match(/^proxy-groups:\n([\s\S]*?)(?=^\S)/m)?.[1];
+const sparkleTemplatesSection = sparkle.match(/^templates:\n([\s\S]*?)(?=^\S)/m)?.[1];
+assert.ok(sparkleGroupsSection && sparkleTemplatesSection, 'Sparkle needs proxy groups and templates');
+
+function sparkleBlocks(section, delimiter) {
+  return new Map(section.split(delimiter).slice(1).map((block) => {
+    const newline = block.indexOf('\n');
+    return [block.slice(0, newline), block.slice(newline + 1)];
+  }));
+}
+
+const sparkleGroups = sparkleBlocks(sparkleGroupsSection, /^  - name: /m);
+const sparkleTemplates = sparkleBlocks(sparkleTemplatesSection, /^  - &/m);
+const sparkleValueAliases = new Map([...sparkle.matchAll(/^    \S+: &([\w-]+) (.+)$/gm)].map((match) => match.slice(1)));
+function sparkleFields(block, name) {
+  assert.ok(block, `Sparkle is missing ${name}`);
+  const entries = [...block.matchAll(/^    (\S+): (.+)$/gm)].map(([, key, value]) => {
+    if (key !== '<<' && value.startsWith('*')) {
+      assert.ok(sparkleValueAliases.has(value.slice(1)), `Sparkle ${name} references unknown value ${value}`);
+      return [key, sparkleValueAliases.get(value.slice(1))];
+    }
+    return [key, value.replace(/^&[\w-]+ /, '')];
+  });
+  const merge = entries.find(([key]) => key === '<<');
+  const aliases = merge ? [...merge[1].matchAll(/\*([\w-]+)/g)].map((match) => match[1]) : [];
+  const inherited = aliases.reverse().flatMap((alias) => [...sparkleFields(sparkleTemplates.get(alias), alias)]);
+  return new Map([...inherited, ...entries]);
+}
+
+const sparklePolicies = new Map([...sparkleGroups].map(([name, block]) => [name, sparkleFields(block, name)]));
+const sparkleVisibleGroups = ['🚀 节点选择', '🤖 AI', '🎬 影音与社交', '💼 办公与账号'];
+assert.deepEqual([...sparklePolicies].filter(([, fields]) => fields.get('hidden') !== 'true').map(([name]) => name).sort(), sparkleVisibleGroups.sort());
+
+function sparkleChoices(name, type) {
+  const fields = sparklePolicies.get(name);
+  assert.equal(fields?.get('type'), type, `Sparkle ${name} should use ${type}`);
+  const list = fields.get('proxies')?.match(/^\[([^\]]+)\]$/)?.[1];
+  assert.ok(list, `Sparkle ${name} must have proxy choices`);
+  const choices = list.split(',').map((choice) => choice.trim());
+  for (const choice of choices) assert.ok(sparklePolicies.has(choice), `Sparkle ${name} has an unknown choice ${choice}`);
+  return choices;
+}
+
+const sparkleAsia = ['🇭🇰 香港', '🇯🇵 日本', '🇸🇬 新加坡'];
+for (const group of ['🚀 节点选择', '🎬 影音与社交']) {
+  assert.deepEqual(sparkleChoices(group, 'select').slice(0, 4), ['🌏 香港优先', ...sparkleAsia]);
+}
+assert.deepEqual(sparkleChoices('🌏 香港优先', 'fallback'), sparkleAsia);
+assert.deepEqual(sparkleChoices('🤖 AI', 'select'), ['🇺🇲 AI 美国优先', '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']);
+assert.deepEqual(sparkleChoices('💼 办公与账号', 'select'), ['🇺🇲 美国', ...sparkleAsia]);
+
+const sparkleAITiers = ['🇺🇲 AI 美国低风险', '🇺🇲 AI 美国家宽', '🇺🇲 AI 美国备用'];
+assert.deepEqual(sparkleChoices('🇺🇲 AI 美国优先', 'fallback'), sparkleAITiers);
+for (const name of [...sparkleAsia, '🇺🇲 美国', ...sparkleAITiers, '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']) {
+  const fields = sparklePolicies.get(name);
+  assert.equal(fields?.get('type'), 'url-test', `Sparkle ${name} should test candidates in its own region`);
+  assert.equal(fields.get('include-all'), 'true', `Sparkle ${name} must use local subscription nodes`);
+  assert.equal(fields.get('exclude-type'), 'direct', `Sparkle ${name} must exclude direct nodes`);
+  assert.equal(fields.get('empty-fallback'), 'REJECT', `Sparkle ${name} must fail closed when empty`);
+  assert.equal(fields.get('expected-status'), name.includes(' AI ') ? '200' : '204', `Sparkle ${name} must accept its health response only`);
+}
+
+function sparkleNodePattern(fields, key) {
+  const regex = fields.get(key)?.replace(/^(['"])(.*)\1$/, '$2');
+  return regex ? new RegExp(regex.replaceAll('(?i)', ''), 'i') : null;
+}
+
+for (const [node, expected] of [
+  ['🇺🇸 纯净 01', sparkleAITiers[0]],
+  ['美国 家宽 1.6x', sparkleAITiers[1]],
+  ['US Los Angeles 5.99x', sparkleAITiers[2]],
+  ['美国 普通线路', sparkleAITiers[2]],
+  ['香港 纯净', null],
+  ['Sydney Australia', null],
+  ['美国 高风险', null],
+  ['美国 低风险 香港出口', null],
+  ['美国 6x', null],
+  ['美国 套餐到期', null],
+]) {
+  const matches = sparkleAITiers.filter((tier) => {
+    const fields = sparklePolicies.get(tier);
+    return sparkleNodePattern(fields, 'filter')?.test(node) && !sparkleNodePattern(fields, 'exclude-filter')?.test(node);
+  });
+  assert.deepEqual(matches, expected ? [expected] : [], `Sparkle AI misclassifies ${node}`);
+}
+
+for (const name of ['🇯🇵 日本', '🇸🇬 新加坡', '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']) {
+  assert.ok(!sparkleNodePattern(sparklePolicies.get(name), 'filter')?.test('日本入口 新加坡出口'));
+}
+
+const sparkleRuleSection = sparkle.match(/^rules:\n([\s\S]*?)(?=^\S)/m)?.[1];
+assert.ok(sparkleRuleSection, 'Sparkle is missing routing rules');
+const sparkleRules = [...sparkleRuleSection.matchAll(/^  - (.+)$/gm)].map((match) => match[1]);
+const sparkleRoutes = [
+  ['🤖 AI', ['my_cursor', 'openai_domain', 'my_ai', 'ai_domain', 'google_gemini_domain']],
+  ['🎬 影音与社交', ['youtube_domain', 'facebook_domain', 'whatsapp_domain', 'instagram_domain', 'linkedin_domain', 'x_domain', 'tiktok_domain', 'telegram_domain', 'netflix_domain', 'facebook_ip', 'telegram_ip', 'netflix_ip']],
+  ['💼 办公与账号', ['my_wm', 'github_domain', 'onedrive_domain', 'microsoft_proxy', 'microsoft_domain', 'paypal_domain']],
+  ['🚀 节点选择', ['my_proxylite', 'google_domain', 'google_ip', 'cloudflare_domain', 'cloudflare_ip', 'geolocation-!cn']],
+  ['DIRECT', ['private_domain', 'my_direct', 'apple_domain', 'microsoft_download', 'microsoft_direct', 'speedtest_domain', 'cn_domain', 'cn_ip']],
+];
+for (const [target, providers] of sparkleRoutes) {
+  for (const provider of providers) {
+    const route = `RULE-SET,${provider},${target}`;
+    assert.deepEqual(sparkleRules.filter((rule) => rule.startsWith(`RULE-SET,${provider},`)).map((rule) => rule.replace(/,no-resolve$/, '')), [route]);
+  }
+}
+assert.ok(sparkleRules.includes('PROCESS-NAME,Speedtest.exe,DIRECT'));
+assert.equal(sparkleRules.at(-1), 'MATCH,🚀 节点选择');
+for (const [first, second] of [
+  ['google_gemini_domain', 'google_domain'],
+  ['youtube_domain', 'google_domain'],
+  ['microsoft_download', 'microsoft_domain'],
+  ['microsoft_direct', 'microsoft_domain'],
+  ['facebook_ip', 'cn_ip'],
+  ['telegram_ip', 'cn_ip'],
+  ['netflix_ip', 'cn_ip'],
+]) {
+  assert.ok(sparkleRules.findIndex((rule) => rule.startsWith(`RULE-SET,${first},`)) < sparkleRules.findIndex((rule) => rule.startsWith(`RULE-SET,${second},`)), `Sparkle must evaluate ${first} before ${second}`);
+}
 
 if (process.argv.includes('--mihomo-only')) {
   assert.doesNotMatch(mihomoProfiles.map(([, profile]) => profile).join('\n'), /raw\.githubusercontent\.com\/hiven425\/hiven\/(?:master|main)\//);

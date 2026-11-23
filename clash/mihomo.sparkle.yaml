@@ -114,173 +114,145 @@ dns:
 
 # ----------------- 锚点与模板 (Templates & Anchors) -----------------
 templates:
-  - &url_test_template
-    type: url-test
-    include-all: true
+  - &RegionalCheck
     url: 'https://www.gstatic.com/generate_204'
-    interval: 900
-    tolerance: 100
+    expected-status: 204
+    interval: 600
     lazy: true
     max-failed-times: 3
-
-  - &GlobalProxies
-    type: select
-    proxies: [♻️ 自动选择, 🚀 节点选择]
-  - &USProxies
-    type: select
-    proxies: [🏚️ 家宽节点, 🇺🇲 美国节点, ♻️ 自动选择, 🚀 节点选择]
-  - &DirectFirst
-    type: select
-    proxies: [DIRECT, 🚀 节点选择]
-  - &AIProxies
-    type: select
-    proxies: [🏚️ 家宽节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇸🇬 新加坡节点, 🇹🇼 台湾节点, ♻️ 自动选择]
-  - &OfficeProxies
-    type: select
-    proxies: [🏚️ 家宽节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇸🇬 新加坡节点, 🇹🇼 台湾节点, ♻️ 自动选择, 🚀 节点选择]
-  - &YouTubeProxies
-    type: select
-    proxies: [♻️ 自动选择, 🇺🇲 美国节点, 🇸🇬 新加坡节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🏚️ 家宽节点, 🚀 节点选择]
-  - &SpeedtestProxies
-    type: select
-    proxies: [DIRECT, ♻️ 自动选择, 🚀 节点选择]
+  - &RegionalNodes
+    <<: *RegionalCheck
+    type: url-test
+    include-all: true
+    exclude-type: direct
+    empty-fallback: REJECT
+    tolerance: 100
+    hidden: true
+    exclude-filter: '(?i)专线|到期|过期|剩余|流量|官网|公告|客服|套餐|重置|高风险|高欺诈|high[ -]risk|\b(?:traffic|expire[ds]?|reset|official[ -]site)\b|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?<![\d.])(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍)'
+  - &AICheck
+    <<: *RegionalCheck
+    url: 'https://chatgpt.com/robots.txt'
+    expected-status: 200
+  - &AIUSNodes
+    <<: [*AICheck, *RegionalNodes]
+    # 美国质量组会按标签进一步排除节点，所以通用排除条件也写入地区过滤。
+    filter: &USNodes '(?i)^(?=.*(?:美国|🇺[🇸🇲]|(?:^|[^A-Za-z])USA?(?:[^A-Za-z]|$)|United States|Los Angeles|New York|San Francisco|Seattle|Dallas|Chicago|Miami|Boston|洛杉矶|纽约|西雅图|圣何塞|硅谷|达拉斯|芝加哥|波特兰|俄勒冈|凤凰城|费利蒙|圣克拉拉))(?!.*(?:香港|Hong[ -]*Kong|日本|Japan|新加坡|Singapore|台湾|Taiwan|韩国|South Korea|加拿大|澳大利亚|澳洲|英国|🇭🇰|🇯🇵|🇸🇬|🇹🇼|🇨🇦|🇦🇺|🇬🇧|🇰🇷|\b(?:HK|HKG|JP|SG|TW|KR)\b|专线|到期|过期|剩余|流量|官网|公告|客服|套餐|重置|高风险|高欺诈|high[ -]risk|\b(?:traffic|expire[ds]?|reset|official[ -]site)\b|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?<![\d.])(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
 
 # ----------------- 策略组 (Proxy Groups) -----------------
 proxy-groups:
+  - name: 🤖 AI
+    type: select
+    proxies: [🇺🇲 AI 美国优先, 🇯🇵 AI 日本, 🇸🇬 AI 新加坡]
+  - name: 🎬 影音与社交
+    type: select
+    proxies: [🌏 香港优先, 🇭🇰 香港, 🇯🇵 日本, 🇸🇬 新加坡, 🇺🇲 美国]
+  - name: 💼 办公与账号
+    type: select
+    proxies: [🇺🇲 美国, 🇭🇰 香港, 🇯🇵 日本, 🇸🇬 新加坡]
   - name: 🚀 节点选择
     type: select
-    proxies: [手动选择, 🏚️ 家宽节点, ♻️ 自动选择, 🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
+    proxies: [🌏 香港优先, 🇭🇰 香港, 🇯🇵 日本, 🇸🇬 新加坡, 🇺🇲 美国]
 
-  - name: 手动选择
-    type: select
-    include-all: true
+  # 严格按地区顺序回退，同一地区内按测速结果选择节点。
+  - name: 🌏 香港优先
+    <<: *RegionalCheck
+    type: fallback
+    hidden: true
+    proxies: [🇭🇰 香港, 🇯🇵 日本, 🇸🇬 新加坡]
+  - name: 🇭🇰 香港
+    <<: *RegionalNodes
+    filter: '(?i)^(?=.*(?:香港|🇭🇰|(?:^|[^A-Za-z])(?:HK|HKG)(?:[^A-Za-z]|$)|Hong[ -]*Kong|Kowloon))(?!.*(?:美国|United States|日本|Japan|新加坡|Singapore|台湾|Taiwan|韩国|South Korea|🇺[🇸🇲]|🇯🇵|🇸🇬|🇹🇼|🇰🇷|\b(?:US|USA|JP|SG|TW|KR)\b)).*$'
+  - name: 🇯🇵 日本
+    <<: *RegionalNodes
+    filter: &JapanNodes '(?i)^(?=.*(?:日本|东京|大阪|名古屋|埼玉|🇯🇵|(?:^|[^A-Za-z])(?:JP|NRT|KIX|FUK)(?:[^A-Za-z]|$)|Japan|Tokyo|Osaka|Nagoya|Kyoto|Okinawa))(?!.*(?:美国|United States|香港|Hong[ -]*Kong|新加坡|Singapore|台湾|Taiwan|韩国|South Korea|🇺[🇸🇲]|🇭🇰|🇸🇬|🇹🇼|🇰🇷|\b(?:US|USA|HK|HKG|SG|TW|KR)\b)).*$'
+  - name: 🇸🇬 新加坡
+    <<: *RegionalNodes
+    filter: &SingaporeNodes '(?i)^(?=.*(?:新加坡|狮城|🇸🇬|(?:^|[^A-Za-z])(?:SG|SIN)(?:[^A-Za-z]|$)|Singapore|Changi|Marina Bay))(?!.*(?:美国|United States|香港|Hong[ -]*Kong|日本|Japan|台湾|Taiwan|韩国|South Korea|🇺[🇸🇲]|🇭🇰|🇯🇵|🇹🇼|🇰🇷|\b(?:US|USA|HK|HKG|JP|TW|KR)\b)).*$'
+  - name: 🇺🇲 美国
+    <<: *RegionalNodes
+    filter: *USNodes
 
-  - name: 📹 YouTube
-    <<: *YouTubeProxies
-  - name: 🍀 Google
-    <<: *AIProxies
-  - name: 🍒 microsoft
-    <<: *OfficeProxies
-  - name: 📦 微软大流量
-    type: select
-    proxies: [DIRECT, 🚀 节点选择]
-  - name: 🏹 ChatGPT
-    <<: *AIProxies
-  - name: 💻 Cursor
-    <<: *AIProxies
-  - name: 💻 GitHub
-    <<: *OfficeProxies
-  - name: 🐬 外贸
-    <<: *USProxies
-  - name: 🎵 TikTok
-    <<: *GlobalProxies
-  - name: 📲 Telegram
-    <<: *GlobalProxies
-  - name: 🎥 NETFLIX
-    <<: *GlobalProxies
-  - name: ✈️ Speedtest
-    <<: *SpeedtestProxies
-  - name: 💶 PayPal
-    <<: *GlobalProxies
-  - name: ☁️ cloudflare
-    <<: *GlobalProxies
-  - name: 🍎 Apple
-    <<: *DirectFirst
-  - name: 🎯 全球直连
-    <<: *DirectFirst
-  - name: 🐟 漏网之鱼
-    <<: *GlobalProxies
-  - name: 🇭🇰 香港节点
-    <<: *url_test_template
-    filter: '^(?=.*(?i)(?:香港|港|🇭🇰|HK|Hong Kong|HKG|沪港|深港|Kowloon|Victoria))(?!.*(?i)(?:美|🇺🇸|US|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
-
-  - name: 🇺🇲 美国节点
-    <<: *url_test_template
-    filter: '^(?=.*(?i)(?:美|🇺🇸|US|USA|States|American|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|New York|Miami|Boston|United States|San Francisco))(?!.*(?i)(?:港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
-
-  - name: 🇯🇵 日本节点
-    <<: *url_test_template
-    filter: '^(?=.*(?i)(?:日本|🇯🇵|JP|NRT|KIX|FUK|Japan|川日|东京|大阪|泉日|埼玉|名古屋|Nagoya|Kyoto|Okinawa))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|新|🇸🇬|SG|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
-
-  - name: 🇹🇼 台湾节点
-    <<: *url_test_template
-    filter: '^(?=.*(?i)(?:台湾|台|🇹🇼|TW|TPE|KHH|Taiwan|新北|彰化|台北|Taipei|高雄|Kaohsiung|Taichung|台中))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|日|🇯🇵|JP|新|🇸🇬|SG|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
-
-  - name: 🇸🇬 新加坡节点
-    <<: *url_test_template
-    filter: '^(?=.*(?i)(?:新加坡|坡|狮城|🇸🇬|SG|SIN|Singapore|Changi|Marina Bay))(?!.*(?i)(?:美|🇺🇸|US|港|🇭🇰|HK|台|🇹🇼|TW|日|🇯🇵|JP|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
-
-  - name: 🌍 其他节点
-    <<: *url_test_template
-    filter: '^(?!.*(?i)(?:美|🇺🇸|US|日本|🇯🇵|JP|台湾|🇹🇼|TW|新加坡|🇸🇬|SG|香港|🇭🇰|HK|韩|🇰🇷|KR|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
-  - name: 🏚️ 家宽节点
-    <<: *url_test_template
-    # 只保留同时带有家宽和美国标识的节点。
-    filter: '^(?=.*(?i)(?:家宽))(?=.*(?i)(?:美国|🇺🇸|(?:^|[^A-Za-z])(?:US|USA)(?:[^A-Za-z]|$)|United States|American|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|New York|Miami|Boston|San Francisco))(?!.*(?i)(?:亚洲|专线|到期|过期|剩余|流量|时间|官网|产品|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
-
-  - name: ♻️ 自动选择
-    type: url-test
-    proxies: [🇭🇰 香港节点, 🇺🇲 美国节点, 🇯🇵 日本节点, 🇹🇼 台湾节点, 🇸🇬 新加坡节点, 🌍 其他节点]
-    url: 'https://www.gstatic.com/generate_204'
-    interval: 900
-    tolerance: 100
-    lazy: true
-    max-failed-times: 3
+  # 优先级依据订阅名称中的标签，健康检查验证 ChatGPT 的连通性。
+  - name: 🇺🇲 AI 美国优先
+    <<: *AICheck
+    type: fallback
+    hidden: true
+    proxies: [🇺🇲 AI 美国低风险, 🇺🇲 AI 美国家宽, 🇺🇲 AI 美国备用]
+  - name: 🇺🇲 AI 美国低风险
+    <<: *AIUSNodes
+    exclude-filter: '(?i)^(?!.*(?:低风险|低欺诈|(?<![非不])纯净|\blow[ -]risk\b|\bclean[ -]ip\b))'
+  - name: 🇺🇲 AI 美国家宽
+    <<: *AIUSNodes
+    exclude-filter: '(?i)^(?!.*(?:(?<![非不])家宽|(?<![非不])住宅|(?<!non[ -])\bresidential\b))|低风险|低欺诈|(?<![非不])纯净|\blow[ -]risk\b|\bclean[ -]ip\b'
+  - name: 🇺🇲 AI 美国备用
+    <<: *AIUSNodes
+    exclude-filter: '(?i)低风险|低欺诈|(?<![非不])纯净|\blow[ -]risk\b|\bclean[ -]ip\b|(?<![非不])家宽|(?<![非不])住宅|(?<!non[ -])\bresidential\b'
+  - name: 🇯🇵 AI 日本
+    <<: [*AICheck, *RegionalNodes]
+    filter: *JapanNodes
+  - name: 🇸🇬 AI 新加坡
+    <<: [*AICheck, *RegionalNodes]
+    filter: *SingaporeNodes
 
 # ----------------- 规则 (Rules) -----------------
 rules:
   - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
   - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
   - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
   - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
   - IP-CIDR6,::1/128,DIRECT,no-resolve
   - IP-CIDR6,fc00::/7,DIRECT,no-resolve
   - IP-CIDR6,fe80::/10,DIRECT,no-resolve
-  - PROCESS-NAME,Speedtest.exe,✈️ Speedtest
-  - DOMAIN-SUFFIX,linux.do,♻️ 自动选择
   - RULE-SET,private_domain,DIRECT
   - RULE-SET,my_direct,DIRECT
-  - RULE-SET,apple_domain,🍎 Apple
-  - RULE-SET,my_proxylite,🚀 节点选择
-  - RULE-SET,my_cursor,💻 Cursor
-  - RULE-SET,my_ai,🏹 ChatGPT
-  - RULE-SET,my_wm,🐬 外贸
-  - RULE-SET,openai_domain,🏹 ChatGPT
-  - RULE-SET,ai_domain,🏹 ChatGPT
-  - RULE-SET,github_domain,💻 GitHub
-  - RULE-SET,youtube_domain,📹 YouTube
-  - RULE-SET,facebook_domain,🐬 外贸
-  - RULE-SET,whatsapp_domain,🐬 外贸
-  - RULE-SET,instagram_domain,🐬 外贸
-  - RULE-SET,linkedin_domain,🐬 外贸
-  - RULE-SET,x_domain,🐬 外贸
-  - RULE-SET,google_domain,🍀 Google
-  - RULE-SET,google_gemini_domain,🍀 Google
-  - RULE-SET,onedrive_domain,🍒 microsoft
-  # Microsoft 大流量下载先于控制面和通用 Microsoft 规则匹配。
-  - RULE-SET,microsoft_download,📦 微软大流量
+  - RULE-SET,apple_domain,DIRECT
+  - PROCESS-NAME,Speedtest.exe,DIRECT
+  - RULE-SET,speedtest_domain,DIRECT
+  - RULE-SET,microsoft_download,DIRECT
   - RULE-SET,microsoft_direct,DIRECT
-  - RULE-SET,microsoft_proxy,🍒 microsoft
-  - RULE-SET,microsoft_domain,🍒 microsoft
-  - RULE-SET,cloudflare_domain,☁️ cloudflare
-  - RULE-SET,tiktok_domain,🎵 TikTok
-  - RULE-SET,speedtest_domain,✈️ Speedtest
-  - RULE-SET,telegram_domain,📲 Telegram
-  - RULE-SET,netflix_domain,🎥 NETFLIX
-  - RULE-SET,paypal_domain,💶 PayPal
-  - IP-CIDR,8.8.8.8/32,🍀 Google,no-resolve
-  - IP-CIDR,8.8.4.4/32,🍀 Google,no-resolve
-  - IP-CIDR,1.1.1.1/32,☁️ cloudflare,no-resolve
-  - IP-CIDR,1.0.0.1/32,☁️ cloudflare,no-resolve
-  - RULE-SET,cn_domain,🎯 全球直连
+
+  - RULE-SET,my_cursor,🤖 AI
+  - RULE-SET,openai_domain,🤖 AI
+  - RULE-SET,google_gemini_domain,🤖 AI
+  - RULE-SET,my_ai,🤖 AI
+  - RULE-SET,ai_domain,🤖 AI
+
+  - RULE-SET,youtube_domain,🎬 影音与社交
+  - RULE-SET,tiktok_domain,🎬 影音与社交
+  - RULE-SET,netflix_domain,🎬 影音与社交
+  - RULE-SET,x_domain,🎬 影音与社交
+  - RULE-SET,telegram_domain,🎬 影音与社交
+  - RULE-SET,facebook_domain,🎬 影音与社交
+  - RULE-SET,whatsapp_domain,🎬 影音与社交
+  - RULE-SET,instagram_domain,🎬 影音与社交
+  - RULE-SET,linkedin_domain,🎬 影音与社交
+
+  - RULE-SET,github_domain,💼 办公与账号
+  - RULE-SET,onedrive_domain,💼 办公与账号
+  - RULE-SET,microsoft_proxy,💼 办公与账号
+  - RULE-SET,microsoft_domain,💼 办公与账号
+  - RULE-SET,paypal_domain,💼 办公与账号
+  - RULE-SET,my_wm,💼 办公与账号
+
+  - DOMAIN-SUFFIX,linux.do,🚀 节点选择
+  - RULE-SET,my_proxylite,🚀 节点选择
+  - RULE-SET,google_domain,🚀 节点选择
+  - RULE-SET,cloudflare_domain,🚀 节点选择
+  - IP-CIDR,8.8.8.8/32,🚀 节点选择,no-resolve
+  - IP-CIDR,8.8.4.4/32,🚀 节点选择,no-resolve
+  - IP-CIDR,1.1.1.1/32,🚀 节点选择,no-resolve
+  - IP-CIDR,1.0.0.1/32,🚀 节点选择,no-resolve
+  - RULE-SET,cn_domain,DIRECT
   - RULE-SET,geolocation-!cn,🚀 节点选择
-  - RULE-SET,google_ip,🍀 Google,no-resolve
-  - RULE-SET,facebook_ip,🐬 外贸,no-resolve
-  - RULE-SET,netflix_ip,🎥 NETFLIX,no-resolve
-  - RULE-SET,telegram_ip,📲 Telegram,no-resolve
-  - RULE-SET,cloudflare_ip,☁️ cloudflare,no-resolve
-  - RULE-SET,cn_ip,🎯 全球直连
-  - MATCH,🐟 漏网之鱼
+  - RULE-SET,google_ip,🚀 节点选择,no-resolve
+  - RULE-SET,facebook_ip,🎬 影音与社交,no-resolve
+  - RULE-SET,netflix_ip,🎬 影音与社交,no-resolve
+  - RULE-SET,telegram_ip,🎬 影音与社交,no-resolve
+  - RULE-SET,cloudflare_ip,🚀 节点选择,no-resolve
+  - RULE-SET,cn_ip,DIRECT
+  - MATCH,🚀 节点选择
 
 rule-anchor:
   ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
