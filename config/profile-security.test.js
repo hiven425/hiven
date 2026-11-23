@@ -199,7 +199,7 @@ function sparkleFields(block, name) {
 }
 
 const sparklePolicies = new Map([...sparkleGroups].map(([name, block]) => [name, sparkleFields(block, name)]));
-const sparkleVisibleGroups = ['🚀 节点选择', '🤖 AI', '🎬 影音与社交', '💼 办公与账号'];
+const sparkleVisibleGroups = ['🚀 节点选择', '🤖 AI', '🎬 影音与社交', '💼 办公与账号', '🌏 香港优先', '🇺🇲 AI 美国自动'];
 assert.deepEqual([...sparklePolicies].filter(([, fields]) => fields.get('hidden') !== 'true').map(([name]) => name).sort(), sparkleVisibleGroups.sort());
 
 function sparkleChoices(name, type) {
@@ -217,12 +217,10 @@ for (const group of ['🚀 节点选择', '🎬 影音与社交']) {
   assert.deepEqual(sparkleChoices(group, 'select').slice(0, 4), ['🌏 香港优先', ...sparkleAsia]);
 }
 assert.deepEqual(sparkleChoices('🌏 香港优先', 'fallback'), sparkleAsia);
-assert.deepEqual(sparkleChoices('🤖 AI', 'select'), ['🇺🇲 AI 美国优先', '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']);
+assert.deepEqual(sparkleChoices('🤖 AI', 'select'), ['🇺🇲 AI 美国自动', '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']);
 assert.deepEqual(sparkleChoices('💼 办公与账号', 'select'), ['🇺🇲 美国', ...sparkleAsia]);
 
-const sparkleAITiers = ['🇺🇲 AI 美国低风险', '🇺🇲 AI 美国家宽', '🇺🇲 AI 美国备用'];
-assert.deepEqual(sparkleChoices('🇺🇲 AI 美国优先', 'fallback'), sparkleAITiers);
-for (const name of [...sparkleAsia, '🇺🇲 美国', ...sparkleAITiers, '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']) {
+for (const name of [...sparkleAsia, '🇺🇲 美国', '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']) {
   const fields = sparklePolicies.get(name);
   assert.equal(fields?.get('type'), 'url-test', `Sparkle ${name} should test candidates in its own region`);
   assert.equal(fields.get('include-all'), 'true', `Sparkle ${name} must use local subscription nodes`);
@@ -231,32 +229,47 @@ for (const name of [...sparkleAsia, '🇺🇲 美国', ...sparkleAITiers, '🇯�
   assert.equal(fields.get('expected-status'), name.includes(' AI ') ? '200' : '204', `Sparkle ${name} must accept its health response only`);
 }
 
-function sparkleNodePattern(fields, key) {
-  const regex = fields.get(key)?.replace(/^(['"])(.*)\1$/, '$2');
-  return regex ? new RegExp(regex.replaceAll('(?i)', ''), 'i') : null;
+function sparkleNodePatterns(fields, key) {
+  const filters = fields.get(key)?.replace(/^(['"])(.*)\1$/, '$2');
+  return filters ? filters.split('`').map((filter) => new RegExp(filter.replaceAll('(?i)', ''), 'i')) : [];
 }
 
+const sparkleUsFallback = sparklePolicies.get('🇺🇲 AI 美国自动');
+assert.equal(sparkleUsFallback?.get('type'), 'fallback');
+assert.equal(sparkleUsFallback.get('include-all-providers'), 'true');
+assert.equal(sparkleUsFallback.has('proxies'), false, 'US AI failover must check provider nodes directly');
+assert.notEqual(sparkleUsFallback.get('include-all'), 'true');
+assert.notEqual(sparkleUsFallback.get('include-all-proxies'), 'true');
+assert.equal(sparkleUsFallback.get('exclude-type'), 'direct');
+assert.equal(sparkleUsFallback.get('empty-fallback'), 'REJECT');
+assert.equal(sparkleUsFallback.get('expected-status'), '200');
+const sparkleUsFilters = sparkleNodePatterns(sparkleUsFallback, 'filter');
+const sparkleUsExclusions = sparkleNodePatterns(sparkleUsFallback, 'exclude-filter');
+assert.equal(sparkleUsFilters.length, 3, 'US AI filters must order low-risk, residential, and general traffic');
+assert.ok(sparkleUsExclusions.length, 'US AI failover must exclude unusable entries');
+
 for (const [node, expected] of [
-  ['🇺🇸 纯净 01', sparkleAITiers[0]],
-  ['美国 家宽 1.6x', sparkleAITiers[1]],
-  ['US Los Angeles 5.99x', sparkleAITiers[2]],
-  ['美国 普通线路', sparkleAITiers[2]],
-  ['香港 纯净', null],
-  ['Sydney Australia', null],
-  ['美国 高风险', null],
-  ['美国 低风险 香港出口', null],
-  ['美国 6x', null],
-  ['美国 套餐到期', null],
+  ['🇺🇸 纯净 01', 0],
+  ['US residential clean IP', 0],
+  ['美国 家宽 1.6x', 1],
+  ['美国住宅线路', 1],
+  ['US Los Angeles 5.99x', 2],
+  ['美国 非纯净 非住宅', 2],
+  ['US non-residential', 2],
+  ['香港 纯净', -1],
+  ['Sydney Australia', -1],
+  ['美国 高风险 家宽', -1],
+  ['美国 低风险 香港出口', -1],
+  ['美国 6x', -1],
+  ['美国 低风险 套餐到期', -1],
 ]) {
-  const matches = sparkleAITiers.filter((tier) => {
-    const fields = sparklePolicies.get(tier);
-    return sparkleNodePattern(fields, 'filter')?.test(node) && !sparkleNodePattern(fields, 'exclude-filter')?.test(node);
-  });
-  assert.deepEqual(matches, expected ? [expected] : [], `Sparkle AI misclassifies ${node}`);
+  const excluded = sparkleUsExclusions.some((filter) => filter.test(node));
+  const firstMatch = excluded ? -1 : sparkleUsFilters.findIndex((filter) => filter.test(node));
+  assert.equal(firstMatch, expected, `Sparkle AI misclassifies ${node}`);
 }
 
 for (const name of ['🇯🇵 日本', '🇸🇬 新加坡', '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']) {
-  assert.ok(!sparkleNodePattern(sparklePolicies.get(name), 'filter')?.test('日本入口 新加坡出口'));
+  assert.ok(!sparkleNodePatterns(sparklePolicies.get(name), 'filter').some((filter) => filter.test('日本入口 新加坡出口')));
 }
 
 const sparkleRuleSection = sparkle.match(/^rules:\n([\s\S]*?)(?=^\S)/m)?.[1];

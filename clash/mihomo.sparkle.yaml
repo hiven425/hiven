@@ -133,16 +133,12 @@ templates:
     <<: *RegionalCheck
     url: 'https://chatgpt.com/robots.txt'
     expected-status: 200
-  - &AIUSNodes
-    <<: [*AICheck, *RegionalNodes]
-    # 美国质量组会按标签进一步排除节点，所以通用排除条件也写入地区过滤。
-    filter: &USNodes '(?i)^(?=.*(?:美国|🇺[🇸🇲]|(?:^|[^A-Za-z])USA?(?:[^A-Za-z]|$)|United States|Los Angeles|New York|San Francisco|Seattle|Dallas|Chicago|Miami|Boston|洛杉矶|纽约|西雅图|圣何塞|硅谷|达拉斯|芝加哥|波特兰|俄勒冈|凤凰城|费利蒙|圣克拉拉))(?!.*(?:香港|Hong[ -]*Kong|日本|Japan|新加坡|Singapore|台湾|Taiwan|韩国|South Korea|加拿大|澳大利亚|澳洲|英国|🇭🇰|🇯🇵|🇸🇬|🇹🇼|🇨🇦|🇦🇺|🇬🇧|🇰🇷|\b(?:HK|HKG|JP|SG|TW|KR)\b|专线|到期|过期|剩余|流量|官网|公告|客服|套餐|重置|高风险|高欺诈|high[ -]risk|\b(?:traffic|expire[ds]?|reset|official[ -]site)\b|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?<![\d.])(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
 
 # ----------------- 策略组 (Proxy Groups) -----------------
 proxy-groups:
   - name: 🤖 AI
     type: select
-    proxies: [🇺🇲 AI 美国优先, 🇯🇵 AI 日本, 🇸🇬 AI 新加坡]
+    proxies: [🇺🇲 AI 美国自动, 🇯🇵 AI 日本, 🇸🇬 AI 新加坡]
   - name: 🎬 影音与社交
     type: select
     proxies: [🌏 香港优先, 🇭🇰 香港, 🇯🇵 日本, 🇸🇬 新加坡, 🇺🇲 美国]
@@ -157,7 +153,6 @@ proxy-groups:
   - name: 🌏 香港优先
     <<: *RegionalCheck
     type: fallback
-    hidden: true
     proxies: [🇭🇰 香港, 🇯🇵 日本, 🇸🇬 新加坡]
   - name: 🇭🇰 香港
     <<: *RegionalNodes
@@ -170,23 +165,18 @@ proxy-groups:
     filter: &SingaporeNodes '(?i)^(?=.*(?:新加坡|狮城|🇸🇬|(?:^|[^A-Za-z])(?:SG|SIN)(?:[^A-Za-z]|$)|Singapore|Changi|Marina Bay))(?!.*(?:美国|United States|香港|Hong[ -]*Kong|日本|Japan|台湾|Taiwan|韩国|South Korea|🇺[🇸🇲]|🇭🇰|🇯🇵|🇹🇼|🇰🇷|\b(?:US|USA|HK|HKG|JP|TW|KR)\b)).*$'
   - name: 🇺🇲 美国
     <<: *RegionalNodes
-    filter: *USNodes
+    filter: '(?i)^(?=.*(?:美国|🇺[🇸🇲]|(?:^|[^A-Za-z])USA?(?:[^A-Za-z]|$)|United States|Los Angeles|New York|San Francisco|Seattle|Dallas|Chicago|Miami|Boston|洛杉矶|纽约|西雅图|圣何塞|硅谷|达拉斯|芝加哥|波特兰|俄勒冈|凤凰城|费利蒙|圣克拉拉))(?!.*(?:香港|Hong[ -]*Kong|日本|Japan|新加坡|Singapore|台湾|Taiwan|韩国|South Korea|加拿大|澳大利亚|澳洲|英国|🇭🇰|🇯🇵|🇸🇬|🇹🇼|🇨🇦|🇦🇺|🇬🇧|🇰🇷|\b(?:HK|HKG|JP|SG|TW|KR)\b|专线|到期|过期|剩余|流量|官网|公告|客服|套餐|重置|高风险|高欺诈|high[ -]risk|\b(?:traffic|expire[ds]?|reset|official[ -]site)\b|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?<![\d.])(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))).*$'
 
-  # 优先级依据订阅名称中的标签，健康检查验证 ChatGPT 的连通性。
-  - name: 🇺🇲 AI 美国优先
+  # 直接检查实体节点，避免子组的旧健康结果挡住已通过检查的线路。
+  # 反引号依次匹配低风险标签、家宽标签和其余美国节点，同档选首个健康节点。
+  - name: 🇺🇲 AI 美国自动
     <<: *AICheck
     type: fallback
-    hidden: true
-    proxies: [🇺🇲 AI 美国低风险, 🇺🇲 AI 美国家宽, 🇺🇲 AI 美国备用]
-  - name: 🇺🇲 AI 美国低风险
-    <<: *AIUSNodes
-    exclude-filter: '(?i)^(?!.*(?:低风险|低欺诈|(?<![非不])纯净|\blow[ -]risk\b|\bclean[ -]ip\b))'
-  - name: 🇺🇲 AI 美国家宽
-    <<: *AIUSNodes
-    exclude-filter: '(?i)^(?!.*(?:(?<![非不])家宽|(?<![非不])住宅|(?<!non[ -])\bresidential\b))|低风险|低欺诈|(?<![非不])纯净|\blow[ -]risk\b|\bclean[ -]ip\b'
-  - name: 🇺🇲 AI 美国备用
-    <<: *AIUSNodes
-    exclude-filter: '(?i)低风险|低欺诈|(?<![非不])纯净|\blow[ -]risk\b|\bclean[ -]ip\b|(?<![非不])家宽|(?<![非不])住宅|(?<!non[ -])\bresidential\b'
+    include-all-providers: true
+    exclude-type: direct
+    empty-fallback: REJECT
+    filter: '(?i)^(?=.*(?:美国|🇺[🇸🇲]|(?:^|[^A-Za-z])USA?(?:[^A-Za-z]|$)|United States|Los Angeles|New York|San Francisco|Seattle|Dallas|Chicago|Miami|Boston|洛杉矶|纽约|西雅图|圣何塞|硅谷|达拉斯|芝加哥|波特兰|俄勒冈|凤凰城|费利蒙|圣克拉拉))(?=.*(?:低风险|低欺诈|(?<![非不])纯净|\blow[ -]risk\b|\bclean[ -]ip\b))`(?i)^(?=.*(?:美国|🇺[🇸🇲]|(?:^|[^A-Za-z])USA?(?:[^A-Za-z]|$)|United States|Los Angeles|New York|San Francisco|Seattle|Dallas|Chicago|Miami|Boston|洛杉矶|纽约|西雅图|圣何塞|硅谷|达拉斯|芝加哥|波特兰|俄勒冈|凤凰城|费利蒙|圣克拉拉))(?=.*(?:(?<![非不])家宽|(?<![非不])住宅|(?<!non[ -])\bresidential\b))`(?i)^(?=.*(?:美国|🇺[🇸🇲]|(?:^|[^A-Za-z])USA?(?:[^A-Za-z]|$)|United States|Los Angeles|New York|San Francisco|Seattle|Dallas|Chicago|Miami|Boston|洛杉矶|纽约|西雅图|圣何塞|硅谷|达拉斯|芝加哥|波特兰|俄勒冈|凤凰城|费利蒙|圣克拉拉))'
+    exclude-filter: '(?i)(?:香港|Hong[ -]*Kong|日本|Japan|新加坡|Singapore|台湾|Taiwan|韩国|South Korea|加拿大|澳大利亚|澳洲|英国|🇭🇰|🇯🇵|🇸🇬|🇹🇼|🇨🇦|🇦🇺|🇬🇧|🇰🇷|\b(?:HK|HKG|JP|SG|TW|KR)\b|专线|到期|过期|剩余|流量|官网|公告|客服|套餐|重置|高风险|高欺诈|high[ -]risk|\b(?:traffic|expire[ds]?|reset|official[ -]site)\b|倍率\s*(?:[6-9]|[1-9]\d)(?:\.\d+)?|(?<![\d.])(?:[6-9]|[1-9]\d)(?:\.\d+)?\s*(?:x|×|倍))'
   - name: 🇯🇵 AI 日本
     <<: [*AICheck, *RegionalNodes]
     filter: *JapanNodes
