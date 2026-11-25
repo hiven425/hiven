@@ -200,7 +200,6 @@ rules:
   - IP-CIDR6,fc00::/7,DIRECT,no-resolve
   - IP-CIDR6,fe80::/10,DIRECT,no-resolve
   - RULE-SET,private_domain,DIRECT
-  - RULE-SET,ai_service_domains,🤖 AI
   - RULE-SET,my_direct,DIRECT
   - RULE-SET,apple_domain,DIRECT
   - PROCESS-NAME,Speedtest.exe,DIRECT
@@ -255,47 +254,10 @@ rule-anchor:
   class: &class {type: http, interval: 86400, behavior: classical, format: text}
 
 rule-providers:
-  # 核心 AI 站点与 API 随覆写加载，远程规则集继续补充其他 AI 域名。
-  ai_service_domains:
-    type: inline
-    behavior: classical
-    payload:
-      # Gemini、AI Studio、NotebookLM 和 Gemini / Vertex API
-      - DOMAIN-SUFFIX,gemini.google.com
-      - DOMAIN-SUFFIX,aistudio.google.com
-      - DOMAIN-SUFFIX,notebooklm.google.com
-      - DOMAIN,ai.google.dev
-      - DOMAIN,gemini.gstatic.com
-      - DOMAIN,geminiweb-pa.clients.google.com
-      - DOMAIN,geminiweb-pa.clients6.google.com
-      - DOMAIN,geminiweb-pa.googleapis.com
-      - DOMAIN,alkalimakersuite-pa.clients6.google.com
-      - DOMAIN,appsgenaiserver-pa.googleapis.com
-      - DOMAIN,notebooklm.googleapis.com
-      - DOMAIN,generativelanguage.googleapis.com
-      - DOMAIN,cloudcode-pa.googleapis.com
-      - DOMAIN,aiplatform.googleapis.com
-      - DOMAIN-REGEX,^[a-z0-9-]+-aiplatform\.googleapis\.com$
-      - DOMAIN-REGEX,^aiplatform\.[a-z0-9-]+\.rep\.googleapis\.com$
-      # ChatGPT 和 OpenAI
-      - DOMAIN-SUFFIX,chatgpt.com
-      - DOMAIN-SUFFIX,chat.com
-      - DOMAIN-SUFFIX,openai.com
-      - DOMAIN-SUFFIX,oaistatic.com
-      - DOMAIN-SUFFIX,oaiusercontent.com
-      - DOMAIN-SUFFIX,oaistatsig.com
-      # Claude 和 Anthropic
-      - DOMAIN-SUFFIX,claude.ai
-      - DOMAIN-SUFFIX,claude.com
-      - DOMAIN-SUFFIX,anthropic.com
-      # Grok 和 xAI
-      - DOMAIN-SUFFIX,grok.com
-      - DOMAIN-SUFFIX,grok.ai
-      - DOMAIN-SUFFIX,x.ai
   youtube_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs"}
   private_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"}
   my_proxylite: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/ProxyLite.list"}
-  my_ai: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/AI.list"}
+  my_ai: {!!merge <<: *class, path: ./rules/hiven-ai.list, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/AI.list"}
   my_cursor: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/Cursor.list"}
   my_direct: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/Direct.list"}
   my_wm: {!!merge <<: *class, url: "https://raw.githubusercontent.com/hiven425/hiven/refs/heads/master/config/wm.list"}
