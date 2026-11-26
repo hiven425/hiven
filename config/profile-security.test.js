@@ -199,7 +199,7 @@ function sparkleFields(block, name) {
 }
 
 const sparklePolicies = new Map([...sparkleGroups].map(([name, block]) => [name, sparkleFields(block, name)]));
-const sparkleVisibleGroups = ['🚀 节点选择', '🤖 AI', '🎬 影音与社交', '💼 办公与账号', '🌏 香港优先', '🇺🇲 AI 美国自动'];
+const sparkleVisibleGroups = ['🚀 节点选择', '🤖 AI', '🎬 影音与社交', '💼 办公与账号', '🌏 香港优先', '🇺🇲 AI 美国自动', '🇺🇲 AI 美国手选'];
 assert.deepEqual([...sparklePolicies].filter(([, fields]) => fields.get('hidden') !== 'true').map(([name]) => name).sort(), sparkleVisibleGroups.sort());
 
 function sparkleChoices(name, type) {
@@ -217,7 +217,7 @@ for (const group of ['🚀 节点选择', '🎬 影音与社交']) {
   assert.deepEqual(sparkleChoices(group, 'select').slice(0, 4), ['🌏 香港优先', ...sparkleAsia]);
 }
 assert.deepEqual(sparkleChoices('🌏 香港优先', 'fallback'), sparkleAsia);
-assert.deepEqual(sparkleChoices('🤖 AI', 'select'), ['🇺🇲 AI 美国自动', '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']);
+assert.deepEqual(sparkleChoices('🤖 AI', 'select'), ['🇺🇲 AI 美国自动', '🇺🇲 AI 美国手选', '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']);
 assert.deepEqual(sparkleChoices('💼 办公与账号', 'select'), ['🇺🇲 美国', ...sparkleAsia]);
 
 for (const name of [...sparkleAsia, '🇺🇲 美国', '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']) {
@@ -235,6 +235,12 @@ function sparkleNodePatterns(fields, key) {
 }
 
 const sparkleUsFallback = sparklePolicies.get('🇺🇲 AI 美国自动');
+const sparkleUsManual = sparklePolicies.get('🇺🇲 AI 美国手选');
+assert.equal(sparkleUsManual.get('type'), 'select');
+assert.equal(sparkleUsManual.get('include-all'), 'true');
+assert.equal(sparkleUsManual.get('exclude-type'), 'direct');
+assert.equal(sparkleUsManual.get('empty-fallback'), 'REJECT');
+assert.equal(sparkleUsManual.get('filter'), sparklePolicies.get('🇺🇲 美国').get('filter'));
 assert.equal(sparkleUsFallback?.get('type'), 'fallback');
 assert.equal(sparkleUsFallback.get('include-all-providers'), 'true');
 assert.equal(sparkleUsFallback.has('proxies'), false, 'US AI failover must check provider nodes directly');
@@ -266,6 +272,7 @@ for (const [node, expected] of [
   const excluded = sparkleUsExclusions.some((filter) => filter.test(node));
   const firstMatch = excluded ? -1 : sparkleUsFilters.findIndex((filter) => filter.test(node));
   assert.equal(firstMatch, expected, `Sparkle AI misclassifies ${node}`);
+  assert.equal(sparkleNodePatterns(sparkleUsManual, 'filter')[0].test(node), expected !== -1, `Sparkle US selector misclassifies ${node}`);
 }
 
 for (const name of ['🇯🇵 日本', '🇸🇬 新加坡', '🇯🇵 AI 日本', '🇸🇬 AI 新加坡']) {
